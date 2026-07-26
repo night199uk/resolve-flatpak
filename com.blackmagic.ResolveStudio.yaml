@@ -30,6 +30,7 @@ finish-args:
   - --filesystem=xdg-videos
   - --filesystem=/media
   - --filesystem=/run/media
+  - --filesystem=xdg-run/gvfs
   - --filesystem=/mnt
   - --persist=.local/share/DaVinciResolve
   - --persist=Videos/CacheClip
@@ -38,7 +39,7 @@ finish-args:
   # https://www.reddit.com/r/Fedora/comments/12z32r1/davinci_resolve_libpango_undefined_symbol_g/
   # - --env=LD_PRELOAD=/lib/x86_64-linux-gnu/libglib-2.0.so.0 /lib/x86_64-linux-gnu/libgio-2.0.so.0 /lib/x86_64-linux-gnu/libgmodule-2.0.so.0 /lib/x86_64-linux-gnu/libgobject-2.0.so.0
   - --env=RUSTICL_ENABLE=radeonsi,iris,nouveau
-#  - --env=OCL_ICD_VENDORS=rusticl.icd
+  # - --env=OCL_ICD_VENDORS=rusticl.icd
 
 command: /app/bin/resolve.sh
 modules:
@@ -62,21 +63,21 @@ modules:
       - type: git
         url: https://github.com/oneapi-src/oneTBB
         tag: v2022.2.0
-  #Build libcxx and ship as a library with Resolve as BM is outdated and segfaults on some setups. Disabled by default.
+  # Build libcxx and ship as a library with Resolve as BM is outdated and segfaults on some setups. Disabled by default.
   # - name: libcxx
-  #  disabled: true
-  #  buildsystem: cmake-ninja
-  #  builddir: true
-  #  subdir: runtimes
-  #  config-opts:
-  #    - -DCMAKE_BUILD_TYPE=Release
-  #    - -DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi
-  #    - -DLLVM_TARGETS_TO_BUILD=X86
-  #    - -Wno-dev
-  #  sources:
-  #    - type: git
-  #      url: https://github.com/llvm/llvm-project.git
-  #      tag: llvmorg-17.0.6
+  #   disabled: true
+  #   buildsystem: cmake-ninja
+  #   builddir: true
+  #   subdir: runtimes
+  #   config-opts:
+  #     - -DCMAKE_BUILD_TYPE=Release
+  #     - -DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi
+  #     - -DLLVM_TARGETS_TO_BUILD=X86
+  #     - -Wno-dev
+  #   sources:
+  #     - type: git
+  #       url: https://github.com/llvm/llvm-project.git
+  #       tag: llvmorg-17.0.6
   - name: resolve
     buildsystem: simple
     build-options:
