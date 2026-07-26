@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #export BMD_RESOLVE_LUT_DIR=
 #export BMD_RESOLVE_SUPPORT_DIR
 export BMD_RESOLVE_CONFIG_DIR="${XDG_CONFIG_HOME}"

@@ -29,7 +29,10 @@ def build_metainfo(app_id: str, app_description: str, app_tag: str):
             build=linux["releaseId"],
             beta=-1 if beta is None or beta.group(1) == "" else beta.group(1)
         )
-        date = datetime.datetime.strptime(download["date"], '%d %b %Y').strftime("%Y-%m-%d")
+        try:
+          date = datetime.datetime.strptime(download["date"], '%d %b %Y').strftime("%Y-%m-%d")
+        except ValueError:
+          date = datetime.date.today().isoformat()
 
         if idx == 0 or latest_description == "":
             latest_description = description
