@@ -6,12 +6,21 @@ app-id: com.blackmagic.Resolve
 runtime: org.freedesktop.Platform
 runtime-version: &runtime-version '25.08'
 sdk: org.freedesktop.Sdk
+add-extensions:
+  com.blackmagic.ResolveStudio.ioplugin:
+    version: '1.0'
+    directory: IOPlugins
+    subdirectories: true
+    no-autodownload: true
+    autodelete: true
 finish-args:
   - --share=ipc
   - --share=network
   - --socket=pulseaudio
   - --socket=x11
   - --device=dri
+  - --device=usb
+  - --usb=vnd:096e
   - --filesystem=xdg-desktop
   - --filesystem=xdg-documents
   - --filesystem=xdg-download
@@ -21,20 +30,19 @@ finish-args:
   - --filesystem=xdg-videos
   - --filesystem=/media
   - --filesystem=/run/media
-  - --filesystem=xdg-run/gvfs
   - --filesystem=/mnt
   - --persist=.local/share/DaVinciResolve
   - --persist=Videos/CacheClip
   - --persist=Videos/.gallery
   - --persist=Documents/BlackmagicDesign
-  - --env=LD_PRELOAD=/lib/x86_64-linux-gnu/libglib-2.0.so.0 /lib/x86_64-linux-gnu/libgio-2.0.so.0 /lib/x86_64-linux-gnu/libgmodule-2.0.so.0 /lib/x86_64-linux-gnu/libgobject-2.0.so.0
   - --env=RUSTICL_ENABLE=radeonsi,iris,nouveau
-#  - --env=OCL_ICD_VENDORS=rusticl.icd
-
 command: /app/bin/resolve.sh
+
 modules:
   - shared-modules/glu/glu-9.json
-  #Ship libcrypt.so.1 with flatpak as not provided by runtime or by Blackmagic. See https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/issues/1708
+  - shared-modules/squashfs-tools/squashfs-tools.json
+  # libcrypt.so.1 no longer provided by the runtime.
+  # See https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/issues/1708
   - name: libxcrypt
     buildsystem: autotools
     config-opts: ["--enable-obsolete-api=glibc"]
@@ -52,48 +60,51 @@ modules:
       - type: git
         url: https://github.com/oneapi-src/oneTBB
         tag: v2022.2.0
-#  #Build libcxx and ship as a library with Resolve as BM is outdated and segfaults on some setups. Disabled by default.
-#  - name: libcxx
-#    disabled: true
-#    buildsystem: cmake-ninja
-#    builddir: true
-#    subdir: runtimes
-#    config-opts:
-#      - -DCMAKE_BUILD_TYPE=Release
-#      - -DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi
-#      - -DLLVM_TARGETS_TO_BUILD=X86
-#      - -Wno-dev
-#    sources:
-#      - type: git
-#        url: https://github.com/llvm/llvm-project.git
-#        tag: llvmorg-17.0.6
-  - name: resolve
-    buildsystem: simple
+  - name: unappimage
+    no-autogen: true
+    make-install-args:
+      - INSTALL_DIR=/app/bin
     build-options:
-      build-args:
-        - --share=network
-    build-commands:
-      - install -Dm644 logo.png /app/share/icons/hicolor/scalable/apps/com.blackmagic.Resolve.png
-      - |
-        ./run_complete_installation.sh
+      cflags: "-Wno-error=incompatible-pointer-types"
+    subdir: squashfs-tools
     sources:
-      - type: file
-        path: python/build_metainfo.py
-      - type: file
-        path: python/main.py
-      - type: file
-        path: python/resolve_download.py
-      - type: file
-        path: python/version.py
-      - type: file
-        path: shell/setup_resolve.sh
-      - type: file
-        path: shell/setup_directories.sh
+      - type: git
+        url: https://github.com/refi64/unappimage
+        branch: master
+        commit: d7f86f2a0d7ec3a69211125207d5f127386b849a
+  - name: resolve-extra
+    buildsystem: simple
+    build-commands:
+      # 1. Install the apply_extra script into the mandatory location
+      - mkdir -p /app/bin
+      - install -m 755 apply_extra /app/bin/apply_extra
+      - install -m 755 resolve.sh /app/bin/resolve.sh
+      - install -m 755 setup_resolve.sh /app/bin
+      - install -m 755 /usr/bin/unzip /app/bin
+      - mkdir -p /app/share/metainfo
+      - chmod 755 /app/share/metainfo
+    sources:
       - type: file
         path: shell/resolve.sh
       - type: file
-        path: run_complete_installation.sh
-      - type: file
-        path: requirements.txt
-      - type: file
-        path: logo.png
+        path: shell/setup_resolve.sh
+      - type: extra-data
+        script: python/resolve_url.py
+        sha256: ee5441ba9150f3cc03c8d5ea27a03bf4a4428cbb1c6d00a1e77edd0fb64fd1e6
+        filename: DaVinci_Resolve_21.1_Linux.zip
+        size: 11161128468
+      - type: script
+        dest-filename: apply_extra
+        commands:
+          - |
+            #!/bin/sh
+            pwd
+            ls -la 
+            echo "Setting up DaVinci Resolve..."
+            /app/bin/unzip -qq DaVinci_Resolve_21.1_Linux.zip
+            ls -la
+            chmod +x DaVinci_Resolve_21.1_Linux.run
+            ls -la
+            /app/bin/setup_resolve.sh
+            ls -laR /app/extra
+

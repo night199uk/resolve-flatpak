@@ -1,11 +1,20 @@
+#!/usr/bin/env python
 import datetime
 import json
 import re
 
 import requests
 
-from resolve_download import Version
+class Version:
+    def __init__(self, major: int, minor: int, patch: int, beta: int, build: int):
+        self.major = major
+        self.minor = minor
+        self.patch = patch
+        self.beta = beta
+        self.build = build
 
+    def __str__(self):
+        return f"""{self.major}.{self.minor}.{self.patch}{"" if self.beta == -1 else f".{self.beta}+{self.build}"}"""
 
 def build_metainfo(app_id: str, app_description: str, app_tag: str):
     response = requests.get('https://www.blackmagicdesign.com/api/support/en/downloads.json')
