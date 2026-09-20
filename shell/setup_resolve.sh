@@ -46,8 +46,8 @@ find squashfs-root -type f -exec chmod a+r,u+w {} \;
 find squashfs-root -type d -exec chmod a+rx,u+w {} \;
 
 # Create directories
-mkdir -p ${PREFIX}/easyDCP ${PREFIX}/scripts ${PREFIX}/share ${PREFIX}/Fairlight ${PREFIX}/share/applications ${PREFIX}/share/icons/hicolor/128x128/apps ${PREFIX}/share/icons/hicolor/256x256/apps "${PREFIX}/Apple Immersive/Calibration" "${PREFIX}/Extras"
-chmod 755 ${PREFIX}/easyDCP ${PREFIX}/scripts ${PREFIX}/share ${PREFIX}/Fairlight ${PREFIX}/share/applications ${PREFIX}/share/icons/hicolor/128x128/apps ${PREFIX}/share/icons/hicolor/256x256/apps "${PREFIX}/Apple Immersive/Calibration" "${PREFIX}/Extras"
+mkdir -p ${PREFIX}/easyDCP ${PREFIX}/scripts ${PREFIX}/share ${PREFIX}/Fairlight ${PREFIX}/share/applications ${PREFIX}/share/icons/hicolor/128x128/apps ${PREFIX}/share/icons/hicolor/256x256/apps "${PREFIX}/Apple Immersive/Calibration" "${PREFIX}/Extras" ${PREFIX}/configs ${PREFIX}/DolbyVision ${PREFIX}/GPUCache "${PREFIX}/Immersive/Canon/STMap" ${PREFIX}/logs ${PREFIX}/Media "${PREFIX}/Resolve Disk Database" ${PREFIX}/.crashreport ${PREFIX}/.license ${PREFIX}/.LUT
+chmod 755 ${PREFIX}/easyDCP ${PREFIX}/scripts ${PREFIX}/share ${PREFIX}/Fairlight ${PREFIX}/share/applications ${PREFIX}/share/icons/hicolor/128x128/apps ${PREFIX}/share/icons/hicolor/256x256/apps "${PREFIX}/Apple Immersive/Calibration" "${PREFIX}/Extras" ${PREFIX}/configs ${PREFIX}/DolbyVision ${PREFIX}/GPUCache "${PREFIX}/Immersive" ${PREFIX}/logs ${PREFIX}/Media "${PREFIX}/Resolve Disk Database" ${PREFIX}/.crashreport ${PREFIX}/.license ${PREFIX}/.LUT
 
 # For extension points
 mkdir -p ${PREFIX}/IOPlugins
@@ -166,6 +166,7 @@ GenericName=${APP_DESCRIPTION}
 Comment=Revolutionary new tools for editing, visual effects, color correction and professional audio post production, all in a single application!
 Exec=/app/bin/resolve.sh %U
 Icon=${APP_ID}
+StartupWMClass=resolve
 Terminal=false
 MimeType=application/x-resolveproj;
 StartupNotify=true

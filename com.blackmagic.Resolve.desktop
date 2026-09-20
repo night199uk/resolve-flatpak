@@ -3,6 +3,7 @@ Type=Application
 Name=Davinci Resolve
 Icon=com.blackmagic.Resolve
 Exec=/app/bin/resolve.sh
+StartupWMClass=resolve
 Actions=GetLogs;PanelSetup;RAWPlayer;RAWSpeedTest;
 
 [Desktop Action GetLogs]
