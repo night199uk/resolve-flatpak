@@ -13,21 +13,27 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-            file: [Resolve, ResolveStudio]
+          config:
+            - package: DaVinci Resolve
+              file: Resolve 
+              key: davinci-resolve
+            - package: DaVinci Resolve Studio
+              file: ResolveStudio
+              key: davinci-resolve-studio
+
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
       options: --privileged
     steps:
-    - id: string
-      uses: ASzc/change-string-case-action@v6
-      with:
-        string: ${{ matrix.file }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.1
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.8
       with:
-        bundle: ${{ steps.string.outputs.lowercase }}.flatpak
-        manifest-path: com.blackmagic.${{ matrix.file }}.yaml
-        cache-key: flatpak-builder-${{ matrix.file }}-${{ github.sha }}
+        bundle: ${{ matrix.config.key }}.flatpak
+        build-debug-bundle: false
+        manifest-path: com.blackmagic.${{ matrix.config.file }}.yaml
+        cache-key: flatpak-builder-${{ matrix.config.key }}-${{ github.sha }}
+        upload-artifact: true
+        artifact-name: ${{ matrix.config.key }}.flatpak
