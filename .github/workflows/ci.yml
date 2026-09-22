@@ -1,4 +1,4 @@
-name: CI
+name: Continuous Integration
 
 on:
   push:
@@ -6,23 +6,22 @@ on:
   pull_request:
   workflow_dispatch:
 
-
 jobs:
-  flatpak:
+  build:
     name: "Flatpak CI"
     runs-on: ubuntu-latest
     strategy:
         matrix:
           config:
             - package: DaVinci Resolve
-              file: Resolve 
+              file: Resolve
               key: davinci-resolve
             - package: DaVinci Resolve Studio
               file: ResolveStudio
               key: davinci-resolve-studio
 
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.11
       options: --privileged
     steps:
     - uses: actions/checkout@v4
@@ -35,5 +34,34 @@ jobs:
         build-debug-bundle: false
         manifest-path: com.blackmagic.${{ matrix.config.file }}.yaml
         cache-key: flatpak-builder-${{ matrix.config.key }}-${{ github.sha }}
-        upload-artifact: true
+        upload-artifact: false
         artifact-name: ${{ matrix.config.key }}.flatpak
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.config.key }}.flatpak
+        path: ${{ matrix.config.key }}.flatpak
+
+  # If the action was a git tag, generate a new release for the tag.
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+
+    steps:
+      # Download all artifacts from Stage 1 into a 'dist' directory
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: davinci*.flatpak
+          merge-multiple: true
+
+      # Safely create the release and upload all assets at once
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: davinci*.flatpak
+          generate_release_notes: true
+
