@@ -17,23 +17,24 @@ resolve-flatpak
 
 This Flatpak installs DaVinci Resolve using Flatpak. 
 
-Technically it is a Qt-based installer, which installs DaVinci Resolve
+Technically it is a Qt-based installer that installs DaVinci Resolve
 from the Blackmagic website on-demand.  It manages the installation,
 checks for updates on run, etc. The Flatpak itself contains no Blackmagic
 binaries or copyright material; and thus can be distributed on Flathub,
 Flatpark etc. It provides the illusion of installing Resolve from Flatpak
 and makes installation simpler for users running - e.g. Silverblue and
-other atomic distributions, and anyone who operates Flatpak-first.
+other atomic distributions, or anyone who operates Flatpak-first.
 
 The Flatpak installation is performed in the Flatpak run directory; e.g.
+```
 /home/<user>/.var/app/com.blackmagic.Resolve/data
-
-This, each user will manage their own Resolve installation.
+```
+Thus, each user will manage their own Resolve installation.
 
 Usage
 -----
 
-1. **Download the latest DaVinciResolve.flatpak or DaVinciResolveStudio.flatpak from the releases page.**
+1. **Download the latest davinci-resolve.flatpak or davinci-resolve-studio.flatpak from the releases page.**
 2. **Install**
 3. **Run DaVinci Resolve [or Studio].**
 4. **The installer will prompt you to install the latest version of DaVinci Resolve [or Studio].**
@@ -49,7 +50,7 @@ flatpak run com.blackmagic.ResolveStudio --print-udev-rules | sudo sh
 
 Plugins
 -------
-I have not yet updated the ffmpeg support to this latest packaging mechanism.
+I have not yet updated the ffmpeg plugin to support this latest packaging mechanism.
 
 Advanced Stuff, Tools, and Compiling
 ------------------------------------
@@ -62,7 +63,7 @@ installer will always obtain the Resolve binaries on run.
 
 #### 
 ```
-git clone https://github.com/pobthebuilder/resolve-flatpak.git --recursive
+git clone https://github.com/night199uk/resolve-flatpak.git --recursive
 
 # This line updates the static resources like icons, desktop files, etc
 # that are packaged in the actual Flatpak.
