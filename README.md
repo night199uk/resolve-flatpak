@@ -1,4 +1,16 @@
+# MAJOR UPDATE:
+I have completely rewritten this Flatpak support with a little help from
+Claude to use a Qt-based meta-installer style approach similar to Steam
+or Discord. I had initially hoped to use Flatpak's extra-data approach,
+however bugs in Flatpak's implementation of extra-data related to very
+large downloads (>8GB) pushed me away from this.
 
+I may not have carried over all fixes, but this approach should be much
+more strategic and allow distribution of this package via e.g. Flathub
+and Flatpak, opening it up to more users.
+
+Contributions are welcome and apologies if any previous contributions
+were lost in the migration.
 
 resolve-flatpak
 ===============
