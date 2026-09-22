@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.blackmagic.ResolveStudio</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+  <name>DaVinci Resolve Studio</name>
+  <summary>Professional Editing, Color, Effects and Audio Post!</summary>
+
+  <description>
+    <p>
+      This software update expands still photography and camera support on the Photo page, as well as adding enhanced multicam controls and an updated trim editor. In addition, there are over 25 new Krokodove shape and 3D tools, updated Fusion macro controls and new project archive and media management options. Blackmagic Cloud Presentations has also been updated with subtitle support, annotation sharing and comment replies. DaVinci Resolve Studio 21.1 adds new individual MultiMaster trims on the color page, integration with AI assistants and 20 new scripting APIs with built-in console support. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">com.blackmagic.ResolveStudio.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>DaVinci Resolve 18 Cut Page</caption>
+      <image>https://images.blackmagicdesign.com/images/products/davinciresolve/overview/onesolution/carousel/cut.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>DaVinci Resolve 18 Edit Page</caption>
+      <image>https://images.blackmagicdesign.com/images/products/davinciresolve/overview/onesolution/carousel/edit.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>DaVinci Resolve 18 Color Page</caption>
+      <image>https://images.blackmagicdesign.com/images/products/davinciresolve/overview/onesolution/carousel/color.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>DaVinci Resolve 18 Fusion Page</caption>
+      <image>https://images.blackmagicdesign.com/images/products/davinciresolve/overview/onesolution/carousel/fusion.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>DaVinci Resolve 18 Fairlight Page</caption>
+      <image>https://images.blackmagicdesign.com/images/products/davinciresolve/overview/onesolution/carousel/fairlight.jpg</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://www.blackmagicdesign.com/products/davinciresolve</url>
+  <project_group>Blackmagicdesign</project_group>
+
+  <provides>
+    <binary>resolve</binary>
+  </provides>
+
+  <releases>    
+    <release version="21.1.0" date="2026-09-08">
+              <description>
+                 This software update expands still photography and camera support on the Photo page, as well as adding enhanced multicam controls and an updated trim editor. In addition, there are over 25 new Krokodove shape and 3D tools, updated Fusion macro controls and new project archive and media management options. Blackmagic Cloud Presentations has also been updated with subtitle support, annotation sharing and comment replies. DaVinci Resolve Studio 21.1 adds new individual MultiMaster trims on the color page, integration with AI assistants and 20 new scripting APIs with built-in console support. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="21.0.4" date="2026-08-05">
+              <description>
+                 This software update adds support for relinking proxy clips with different formats, support for additional X-OCN formats, the ability to use API scripting to review selected clips on the timeline and improved realtime playback on timelines with a large cache. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="21.0.3" date="2026-07-22">
+              <description>
+                 This software update adds new ease modes for retime speed and frame curves, as well as improved handling of interlaced media, keyframe editing, multicam audio and PSD imports. This update also reinstates QuickSync encode options for older Intel systems and adds a custom install location for encode SDK plugins on Windows ARM. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="21.0.2" date="2026-07-02">
+              <description>
+                 This software update adds faster image bypass switching, improved H.265 playback performance on NVIDIA GPUs and better text display in the inspector. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="21.0.1" date="2026-06-24">
+              <description>
+                 This software update improves DNG and Apple ProRAW decoding, Fusion dual screen layouts and HDR metadata handling for H.265 HDR renders. The update also improves reliability when using AI CineFocus and adds support for Sony α7R VI ARW RAW stills and Affinity RGB 16-bit formats. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="21.0.0" date="2026-06-03">
+              <description>
+                 This software update installs the final release of DaVinci Resolve Studio 21 which adds support for new AI tools including IntelliSearch, CineFocus and tools for facial refinement. This update also adds support for the new Photo page for still images, Krokodove toolset to Fusion, new Fairlight folders, plus improvements for keyframing, MultiMaster trim passes, layer list node graphs and more. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="20.3.3" date="2026-05-13">
+              <description>
+                 This software update is for anyone using DaVinci Resolve Studio 20. It improves Fusion memory usage on Mac OS 26, addresses a metadata issue in Dolby Vision IMF renders and provides general performance and stability improvements. These improvements are already in DaVinci Resolve 21 Public Beta 3.
+              </description>
+            </release><release version="20.3.2" date="2026-02-12">
+              <description>
+                 This software update adds new trim editor options for dynamic trimming, improved kerning for subtitles, and new colorspace and gamma options for Fujifilm camera footage. It also includes improved magic mask caching, as well as better metadata retention and timeline rendering for immersive and stereo 3D projects. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="20.3.1" date="2025-12-17">
+              <description>
+                 This software update adds the ability to quickly search for effects in Chinese, Japanese and Korean, improvements to Fusion previews for transforms and merges, as well as improved HDR10 metadata embedding and better stereoscopic 3D monitoring. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="20.3.0" date="2025-11-30">
+              <description>
+                 This software update adds support for 32K resolution support on Apple M5 Macs, improves timeline versioning with custom naming, adds new metadata fields in the media pool and improves Resolve FX noise reduction performance. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="20.2.3" date="2025-11-04">
+              <description>
+                 This software update adds support for up to 4x faster Magic Mask, Depth Map and Super Scale performance on Windows Intel GPUs, as well as a new hotkey for the timeline keyframe and curves tray and decode support for WEBM and MKV clips with VP8 video codec. In addition, this update adds improved decoding of MP4 clips and MKV files, better metadata retention on exported EXRs and support for Blackmagic RAW 5.1. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="20.2.2" date="2025-10-15">
+              <description>
+                 This software update adds improved viewer color management when working with Rec. 709 files on Mac, smoother playback in the Fairlight audio page, improved trimming and ripple behaviours on the edit timeline, and better preservation of immersive camera data when converting EXR files back to ProRes. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="20.2.1" date="2025-09-23">
+              <description>
+                 This software update adds more consistent ripple trimming behavior, better copy and paste behaviour of attributes, as well as improved track recognition for timeline source editing. This update also improves Apple ProRes RAW and Sony ARW clips. This version requires a DaVinci Resolve Studio license dongle, Blackmagic Cloud license or software activation code.
+              </description>
+            </release><release version="20.2.0" date="2025-09-10">
+              <description>
+                 This software update adds support for immersive EXR workflows and streaming immersive content from Fusion directly into Apple Vision Pro. In addition, there is improved track patching and ripple trim controls, new custom metadata fields and support for playing Apple ProRes RAW. DaVinci Resolve Studio 20.2 also improves MultiText alignment and transformation controls in Fusion and adds a new AI Cinematic Haze effect on the color page. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="20.1.1" date="2025-08-26">
+              <description>
+                 This software update adds support for faster load times of Blackmagic Cloud projects with stacked timelines, improved retention of clip copy and paste options and cleaner layer and node layout for PSD file imports in Fusion. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="20.1.0" date="2025-08-07">
+              <description>
+                 This software update adds support for Apple Iimmersive workflows, Apple Vision Pro monitoring and Apple Spatial Audio Format for macOS users. In addition, there is support for AI Magic Mask 2 in Fusion and improved MultiText character and paragraph level styling. This update also adds the option to process clip compositions in your timeline resolution, improved safe area controls with new custom guides, rulers and snapping tools on the cut and edit page. Support for 32-bit floating point recording on cut, edit and Fairlight timelines has also been added. Sample immersive video clips for use in DaVinci Resolve Studio 20.1 for macOS are available to download from http://bmd.link/Ndw4pz. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="20.0.1" date="2025-06-30">
+              <description>
+                 This software update adds support for more consistent drag and drop behavior of media pool clips, better beat marker detection when resizing music track lengths with AI Music Editor, and improved OpenColorIO consistency in the Fusion viewer. In addition, there is improved node cache retention for color changes and support for Blackmagic RAW 4.6. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="20.0.0" date="2025-05-28">
+              <description>
+                 This software update installs the final release of DaVinci Resolve Studio 20 which adds support for over 100 new features and AI tools such as AI IntelliScript, AI Animated Subtitles, AI Multicam SmartSwitch and AI Audio Assistant, as well as keyframe editing, voice over palette, multi layer compositing tools, new optical flow vector tools and major updates to Magic Mask and depth map. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.1.4" date="2025-03-21">
+              <description>
+                 This software update adds support for Blackmagic RAW files shot on Blackmagic URSA Cine 17K 65. In addition, this update adds support for Apple ProRes encoding on Windows and Linux systems, support for Samsung Log LUTs, as well as improved network decode performance and exporting of embedded AAFs. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.1.3" date="2025-01-20">
+              <description>
+                 This software update improves cache clearing, provides better Fusion effect previews and ensure accurate syncing of AAF clips. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.1.2" date="2024-12-18">
+              <description>
+                 This software update adds more reliable dongle recognition on Windows systems, provides better playback of audio fades on clips with effects and improves handling of Open EXR metadata capture. In addition, there is improved gyro stabilization in certain Blackmagic RAW decode modes and better handling of Fusion compositions when disabling macros. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.1.1" date="2024-12-02">
+              <description>
+                 This software update adds the ability to paste clips in the timeline at either the playhead or the in and out points. It also improves system stability when previewing transitions and supports better rendering of sphere maps. In addition, there is greater stability when rendering linear b-splines in Fusion and better display of timeline thumbnails on the color page. For Fairlight, there is improved automation of trim controls and better interpretation of imported AAFs. There are also improvements to H.265 encoding and H.265 multipass renders. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.1.0" date="2024-11-12">
+              <description>
+                 This software update adds new Fusion titles and effects, as well as better object mask caching and support for decoding and playback of spatial photos and videos. In addition, there is improved multicam audio editing and better effect handling for stereo tracks. Edit page updates include additional options for audio ducking, trim shortcuts and a new audio trim slider in the inspector. Fusion updates include support for USD 24, USD scene export from compositions, as well as polygon and B-spline viewer toolbar controls. For color, there are new gallery node stack selection tools and new custom curve controls for the DaVinci Resolve Mini Panel. This update also improves audio track management and provides better visibility of trimmed clips in Fairlight, improved sync bin functionality on the media page and the ability to reorder render jobs on the deliver page. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.0.3" date="2024-10-17">
+              <description>
+                 This software update adds support for Blackmagic RAW 4.3 as well as improved LUT application and support for subframe source parameters when using certain scripting APIs. In addition there are improvements to the Fusion multimerge tool and proxy generation for ARRI clips. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.0.2" date="2024-10-02">
+              <description>
+                 This software update adds support for decoding MPEG transport stream clips, additional API script support and improved audio alignment when replacing clips in the media pool. In addition, this update enables sub clip markers to be displayed correctly in the source viewer and improves metadata updates of EDL clip names. This version requires a DaVinci Resolve Studio license dongle or software activation code
+              </description>
+            </release><release version="19.0.1" date="2024-09-04">
+              <description>
+                 This software update adds improved timeline responsiveness when moving a large number of clips, smoother playback when using a fixed playhead, as well as better media management when transcoding embedded AAF content. In addition, there’s improved matte performance when duplicating timelines or applying grades between clips and improved license activation on Mac OS 15 Sequoia computers. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="19.0.0" date="2024-08-22">
+              <description>
+                 This software update installs the final release of DaVinci Resolve Studio 19 which adds support for new DaVinci Neural Engine AI tools and over 100 feature upgrades including new color grading palettes and Resolve FX, Fairlight AI audio panning, expanded USD tools, multi-source editing and multipoly rotoscoping in Fusion. There is also improvement to the transcription workflow for editors. DaVinci Resolve Studio also includes new AI tools including IntelliTrack AI and ColorSlice grading. In addition, there is support for DaVinci Resolve Replay, live media sync into DaVinci Resolve bins for editing while the camera is recording and the new Organizations App in Blackmagic Cloud. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.6.6" date="2024-03-20">
+              <description>
+                 This software update adds support for AVC MXF Op Atom formats, improved alpha channel interpretation for QuickTime files and better media management of 8K X-OCN clips when trimming. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.6.5" date="2024-02-07">
+              <description>
+                 This software update adds support for Blackmagic RAW 3.6.1 and Sony Burano files, as well as the ability to import and export compound clips and clip markers in Open TimelineIO. DaVinci Resolve Studio 18.6.5 also adds AI stabilization for Blackmagic Cinema Camera 6K and Micro Studio Camera 4K G2 footage, better EXR file labeling and improved shortcut functionality for multiple clip selections. This version requires a DaVinci Resolve Studio license dongle or software activation code. 
+              </description>
+            </release><release version="18.6.4" date="2023-12-05">
+              <description>
+                 This software update adds support for Blackmagic RAW 3.6, as well as transcription controls for bins, user details for uploaded shared clips, and a clip color filter in the lightbox workspace. In addition, camera RAW settings are now retained with timeline backups and Fairlight automation display is retained when adding audio clips. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.6.3" date="2023-11-14">
+              <description>
+                 This software update adds support to sync media from network folders for cloud projects, the option to prevent sleep mode while uploading files or generating proxies, and the ability to deliver projects using proxy media. In addition, there is added support for decoding 4:2:2 HEIF and HIF clips, stability improvements when ripple editing large timelines and improved audio syncing when bouncing audio with voice isolation. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.6.2" date="2023-10-10">
+              <description>
+                 This software update fixes an issue when duplicating a timeline where parameters may not be set correctly.
+              </description>
+            </release><release version="18.6.1" date="2023-10-06">
+              <description>
+                 This software update sets proxy workflows as default, improves cloud sync when importing older projects and fixes timeline delays when ripple editing. This update also improves playback when editing or moving clips and provides better multichannel audio importing. In addition, there are improvements in showing the current timeline and better system stability when working with 3D text. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.6.0" date="2023-09-15">
+              <description>
+                 This software update adds support for the new Blackmagic Camera and Blackmagic Cloud Storage workflow with automatic media pool and project media folder file syncing with all project collaborators and background proxy generation. In addition, this update adds support for outer text stroke in titles and font case on subtitles, as well as support for extruding 3D shapes and rendering USD scenes with materials and volumes. This update also adds support to select audio loudness standards on renders and an updated tool to remove unused clips. DaVinci Resolve Studio 18.6 update adds support for the latest Dolby Vision and UWA Audio Vivid 3D spatial audio format. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.5.1" date="2023-08-14">
+              <description>
+                 This software update adds improved support for maintaining color grade versions when stabilizing clips, better audio playback for bus tracks, as well as more consistent copy and pasting of power windows and power window data. In addition, DaVinci Resolve Studio 18.5.1 improves playback when using voice isolation on energy efficient CPU and GPU systems. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.5.0" date="2023-07-21">
+              <description>
+                 This software update installs the final release of DaVinci Resolve Studio 18.5 which adds support for new AI tools, as well as over 100 new features including text based editing, AI dialogue transcription, new cut page editing toolset, new Fairlight audio mix automation and Universal Scene Description file support. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.1.4" date="2023-03-06">
+              <description>
+                 This software update adds faster loading of timelines with multiple markers and better handling of creation date metadata. It also adds improvements to the grab all stills function and audio scrubbing in the sync bin as well as support for monochrome decoding of ARRI RAW clips. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.1.3" date="2023-02-06">
+              <description>
+                 This software update adds support for DNx Uncompressed and Sony Venice 2 file formats, new color selection options for Fusion highlight tools, as well as better Text+ performance and improved handling of audio effect dialogs. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.1.2" date="2022-12-22">
+              <description>
+                 This software update adds support for iPad Bluetooth support to DaVinci Resolve Speed editor as well as general performance and stability improvements. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.1.1" date="2022-11-23">
+              <description>
+                 This software update adds support for Blackmagic RAW 2.8, display scaling options for Windows and restored keyboard shortcuts. In addition, this update improves AI based voice isolation for short audio clips. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.1.0" date="2022-11-11">
+              <description>
+                 This software update adds support for editing in social media vertical resolutions such as TikTok, Snapchat and Instagram TV, DaVinci Neural Engine enabled AI voice isolation tools, vector keyframing for Fairlight automation curve editing and support for automatic individual timeline locks for multi-user collaboration. For audio, this update adds a new AI dialogue leveler and Fairlight grid support for editing to timecode or musical tempo. This update also improves ATEM Mini ISO project importing, now keeping audio attached to video clips. DaVinci Resolve Speed Editor functionality has been added to the edit page with support for subtitle track presets and per track formatting rules. There’s also support for Dolby Vision cinema trims, fractional display scaling for Windows and Linux and overall performance improvements with multiple tools. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.0.4" date="2022-09-30">
+              <description>
+                 This software update adds support for Blackmagic RAW 2.7 as well as general performance and stability improvements. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.0.3" date="2022-09-15">
+              <description>
+                 This software update improves USB-C connectivity with Fairlight Desktop Consoles, adds better rendering of clips without color nodes, as well as addressing issues with IMF rendering and deleting empty tracks on imported AAF timelines. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.0.2" date="2022-09-07">
+              <description>
+                 This software update improves YouTube delivery and gallery file management as well as better render in place results and improved handling of track metadata. In addition, this update improves trimming for H.264 and ARRI clips in media management as well as addressing an issue with gyro stabilization edges not blanking correctly. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.0.1" date="2022-07-26">
+              <description>
+                 This software update fixes a problem with DNx support as well as improving power grade still saving. This update also improves color space selection for upgraded ACES projects and addresses an issue with Fusion’s Mandelbrot tool on Apple silicon machines. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="18.0.0" date="2022-07-20">
+              <description>
+                 This software update installs the full shipping version of DaVinci Resolve 18 Studio which adds support for Blackmagic Cloud workflows as well as the DaVinci Proxy Generator app. In addition, this update adds new Resolve FX such as surface tracker to add effects to flexible moving surfaces, 3D depth map for separating backgrounds and isolating objects, and ultra beauty mode. This update also adds improved subtitling, 5x5 multiview for large multicam projects, Fairlight fixed to FlexBus and GPU accelerated paint in Fusion. This software update also adds support for Blackmagic RAW 2.6 and the ability to stabilize clips using AI and camera gyroscope metadata. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.4.6" date="2022-03-29">
+              <description>
+                 This software update adds support for Nikon RAW files, a Sony IMF render preset and improved stability with 3D renders in Fusion on Apple Mac models with M1 Max processors. In addition, DaVinci Resolve Studio 17.4.6 adds better audio proxy handling and Vimeo credential recognition, as well as improved stability when using HDR controls on Apple silicon models. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.4.5" date="2022-03-07">
+              <description>
+                 This software update improves deconstruction of nested timelines for audio tracks, and adds support for 20% faster decoding and rendering of Blackmagic RAW 12K files on Apple M1 Max. DaVinci Resolve 17.4.5 also adds support for decoding 6K and 8K clips from Sony Venice and improves text processing with 3D text and Text+ fonts. In addition, this update improves importing of AAF files with retime or mixed frame rates. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.4.4" date="2022-02-16">
+              <description>
+                 This software update adds support Blackmagic RAW 2.3, security improvements when working with Dropbox and YouTube and better processing speeds for clips with Fusion effects. In addition, DaVinci Resolve Studio 17.4.4 adds support for hardware accelerated VP9 decodes and support for encoding Main10 H.265 on Apple silicon models. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.4.3" date="2021-12-21">
+              <description>
+                 This software update improves system stability when working on Windows computers, as well as adding better character styling behaviour and output blanking. For Fairlight, this software update adds improvements to clip naming, crossfades, and audio monitoring. DaVinci Resolve 17.4.3 also adds further improvements to decode performance when working with ProRes files on Apple Mac models with M1 Max processors. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.4.2" date="2021-11-17">
+              <description>
+                 This update improves playback performance for Fusion titles and effects as well as improving system stability when adjusting power windows, changing location settings or working with Windows computers running older drivers. This update also improves rendering of H.264 clips on Windows systems and provides better performance when working with VST3 plugin or exporting to ProTools. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.4.1" date="2021-10-29">
+              <description>
+                 This software update fixes issues with automatic recognition of HDR displays on Apple Macs and adds a consistent approach to frame based clip imports. In addition, this update improves fade trimming behavior on the edit timeline, provides better retention of smart filter settings and fixes issues with playback performance and unicode character display for Text+. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.4.0" date="2021-10-22">
+              <description>
+                 In addition to the features in the free version, the Studio update adds Dropbox Replay integration, switching capability for multicam angles with DaVinci Resolve Speed Editor, and support for ACES 1.3 including gamut compression. It also includes a new film halation Resolve FX and faster decodes and encodes for Windows Intel systems. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.3.2" date="2021-10-08">
+              <description>
+                 This software update adds support for Blackmagic RAW 2.2, improved stability when using the color warper tool and better highlight rendering in the wide gamut color space. This update also adds improvements to clip naming functionality in Fairlight and more consistent loading of EQ and automation adjustments, as well as general performance and stability improvements. This version requires a DaVinci Resolve Studio license dongle or software activation code. 
+              </description>
+            </release><release version="17.3.1" date="2021-09-02">
+              <description>
+                 This software update adds the ability to combine multiple source audio files to export as interleaved audio. It also improves YouTube and Vimeo sign in for Windows systems and improves middle click behavior when using tablets. DaVinci Resolve 17.3.1 Update also adds improved stability when adding stills to memories as well as better Apple ProRes 4444 processing on Apple Silicon systems. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.3.0" date="2021-08-20">
+              <description>
+                 This software update adds a new processing engine for improved performance on Apple Mac models with the M1 chip. In addition, there are new controls for Resolve FX including aperture diffraction, mosaic blur, keyer and glow, as well as improvements in audio latency and the Fairlight export dialog. Edits from subclips can now be match framed to original media, plus DaVinci Resolve 17.3 will now decode AVC Intra files using the media engine built into the Apple M1 chip. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.2.2" date="2021-07-01">
+              <description>
+                 This software update adds support for Blackmagic RAW 2.1, improved Bluetooth connectivity for DaVinci Resolve Speed Editor and better YouTube credential recognition. This update also adds improvements to color mapping and source viewer playback as well as general performance and stability improvements. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.2.1" date="2021-06-02">
+              <description>
+                 This software update adds support for improved playback performance when working with network storage devices and a more responsive HDR palette when using color panels. This update also adds more reliable audio playback when working in longer timelines, improved representation of the audio waveform for normalized 32 bit audio and better audio playback with MKV clips when working on Windows systems. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.2.0" date="2021-05-12">
+              <description>
+                 This software update adds improved startup performance and changes the default save setting to live save, as well as adding support for applying and managing crossfades in the Fairlight timeline and for controlling track processing order in the Fairlight mixer. This update also adds support for Fusion template bundles along with the ability to decode AV1 clips on Windows machines and support to decode MKV clips across all platforms. DaVinci Resolve Studio 17.2 also includes support for renaming individual timeline clips and setting handles when performing audio only renders. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.1.1" date="2021-03-31">
+              <description>
+                 This software update adds support for hardware accelerated decoding of H.264 10-bit formats on Macs running Apple M1 processors, improves reliability when restoring older database backups as well as adding better audio performance in various playback scenarios. Additionally, this update adds support for Blackmagic RAW clips recorded by Blackmagic Video Assist 12G HDR from Panasonic Lumix S1H cameras, improves functionality for Resolve FX blanking fill, improves scripting API, and formats metadata more accurately when rendering DNxHR clips. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.1.0" date="2021-03-10">
+              <description>
+                 This software update adds universal app support for Macs running Apple M1 processors and is compatible with Mac OS Big Sur. This update also adds support for hardware accelerated encoding and decoding of H.265 10-bit 4:2:2 and 4:4:4 formats on supported Intel platforms. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="17.0.0" date="2021-02-25">
+              <description>
+                 This software update installs the full shipping version of DaVinci Resolve Studio 17 which adds over 300 features and enhancements including new color management, HDR, color warper and magic mask tools. This update also includes improved Fairlight usability with support for up to 2,000 tracks with flexible cascade bussing while the edit page now includes smart reframe, timeline audio and video syncing, keyer, compositing and video collage. DaVinci Resolve 17 also includes new Fusion effects templates, shape nodes, animation curves and synced audio animations as well as encoder plug-ins, 3rd party workflow integration, and more. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.8" date="2020-11-25">
+              <description>
+                 This update adds support for Blackmagic RAW clips recorded by Blackmagic Video Assist 12G HDR from Nikon Z 6 and Z 7 cameras. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.7" date="2020-09-17">
+              <description>
+                 This software update adds support for NVIDIA Ampere GPUs on Windows and improved reliability when importing ATEM Mini Pro ISO projects with 23.976 fps media. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.6" date="2020-08-27">
+              <description>
+                 This update adds support for Blackmagic RAW 1.8.1, Final Cut Pro X XML v1.9, as well as general performance and stability improvements. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.5" date="2020-07-31">
+              <description>
+                 This update adds support for importing projects from ATEM switchers into DaVinci Resolve, improves the listing of numbered still frames in the media pool, addresses offline frame issues for some H.264 clips on Windows and makes relinking AAF clips in different folders more reliable. This version requires a DaVinci Resolve license dongle or software activation code.
+              </description>
+            </release><release version="16.2.4" date="2020-07-15">
+              <description>
+                 This software update features improved debayering support for RAW clips from EOS-1D X Mark III and EOS R5 cameras, more accurate playhead syncing on the cut page, better tone mapping in HDR projects, and faster Kakadu JPEG 2000 decode performance on Linux and Windows. DaVinci Resolve 16.2.4 also addresses an issue that affected project saving after editing audio keyframes, improves custom Fusion tool performance, adds support for Blackmagic RAW 1.8 and more. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.3" date="2020-06-18">
+              <description>
+                 This software update adds support for version 4.1 of the Dolby Vision CM algorithm and provides the ability to generate v2.9 trims from v4. In addition, you can now export a Dolby Vision v2.9 XML from a v4 project. DaVinci Resolve 16.2.3 also improves performance with Canon EOS-1D X Mark III and EOS R5 clips using Apple Metal, addresses ARRIRAW playback performance and ACES IDTs with ARRI MXF clips. This update also improves audio trimming, fixes Fairlight index display issues, layering with cloned audio clips, and now correctly moves tracks over linked audio tracks. DaVinci Resolve 16.2.3 update also includes improvements to Fusion Text+ shading, gradients, Fusion previews and more. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.2" date="2020-05-19">
+              <description>
+                 This software update adds support for hardware accelerated H.265 Main10 renders on Mac, Blackmagic RAW LUT name viewing in clip metadata, and custom output frame rates for YouTube, Vimeo and frame.io. DaVinci Resolve 16.2.2 update also supports frame.io task status markers, Rec. 709-A gamma for QuickTime player, level shifts with H.264 playback on Mac, and better handling of audio transitions when trimming clips in the timeline. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.1" date="2020-04-21">
+              <description>
+                 This software update adds new support for H.265 4:4:4 12-bit files when using NVIDIA GPUs, allows for encoding of 32-bit float audio in QuickTime clips, supports trimming QuickTime audio clips when managing media, and adds support for double clicking to open DRP files on Windows and Linux. DaVinci Resolve Studio 16.2.1 update also improves decode support for 10-bit H.265 4:4:4 as well as performance with ProRes, DNxHR, and OpenEXR on high end CPUs. DolbyVision analysis has been improved, systems with Intel graphics are now more reliable, and general improvements have been made for decoding camera clips with AAC audio, HDR tone mapping, transition performance and more. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.2.0" date="2020-03-06">
+              <description>
+                 This software update adds new Fairlight editing tools including a new edit selection mode, new context sensitive editing tools and commands and much more. DaVinci Resolve 16.2 also adds scalable waveforms in the Fairlight timeline, new Fairlight FX and metering plug-ins, the Blackmagic Fairlight Sound Library, support for immersive 3D audio formats, and a new bounce to file command. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.1.2" date="2019-12-17">
+              <description>
+                 This update adds new audio and video editing buttons and mark in and out buttons to the cut page, along with improved smart edit indicators. DaVinci Resolve 16.1.2 supports audio playback while trimming, new timeline zoom indicators on the edit page and improved responsiveness when using the DaVinci Resolve Editor Keyboard. This update also improves DCP and IMF support, adds support for CUDA based R3D on Windows and Linux, improves performance in collaborative projects, supports monitor names in the workspace menu, copying and pasting Dolby Vision midtone offset values, adds new scripting APIs and more.
+              </description>
+            </release><release version="16.1.1" date="2019-10-31">
+              <description>
+                 This software update improves multicam editing on both the cut and edit pages, improved 4K Cinema DNG performance, better AAF support, better H.264 encoding and more. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.1.0" date="2019-10-18">
+              <description>
+                 This update adds a new sync bin for working with multiple angles from different cameras on the cut page, a new boring detector, enhanced close up edits using facial recognition, improved trimming and snapping, redesigned timeline rulers, more accurate waveform drawing and introduces interface refinements on the cut page. DaVinci Resolve 16.1 also features support for Blackmagic Pocket Cinema Camera presets in the Fusion 3D camera tracker, improved adjustment clips, better keyframe smoothing for position animations, improved CIE scopes, support for alpha channels when using ResolveFX and OpenFX plugins, and more. This version requires a DaVinci Resolve Studio license dongle or software activation code.
+              </description>
+            </release><release version="16.0.0" date="2019-08-09">
+              <description>
+                 This software installs the full shipping version of DaVinci Resolve 16 Studio which features the new Cut page along with over a hundred new tools, features and improvements such as the DaVinci Neural Engine, facial recognition, speed warp retiming, adjustment clips, GPU accelerated scopes, new Resolve FX, faster Fusion performance, elastic wave audio alignment, new Fairlight FX, immersive 3D audio support and more. This version requires a DaVinci Resolve license dongle or software activation code.
+              </description>
+            </release><release version="15.3.1" date="2019-04-05">
+              <description>
+                 Adds support for Blackmagic RAW SDK 1.3 as well as general performance and stability improvements.
+              </description>
+            </release><release version="15.3.0" date="2019-03-07">
+              <description>
+                 This software update adds support for the new Blackmagic URSA Mini Pro 4.6K G2 camera and the latest Blackmagic RAW SDK 1.3. In addition, this update improves support for audio metadata when exporting AAF files, adds high frame rate timecode support for EXR clips, and improves both AAC audio and Wacom tablet responsiveness on Windows systems. This version requires a DaVinci Resolve Studio dongle or software activation code.
+              </description>
+            </release><release version="15.2.4" date="2019-02-12">
+              <description>
+                 This software update improves performance of video playback on the edit page, including multicam playback. H.265 and H.265 encoding has also been improved on the Mac, the latest version of Intel OpenCL drivers is now supported on Windows, project load and save performance is faster, and 5.1 and 7.1 IMF clip handling is improved. In addition, decode support for different Canon XF-AVC clip formats has been added to DaVinci Resolve Studio, font detection on Windows is improved, and support for Sony Venice 3.0 firmware has been added. This version requires a DaVinci Resolve Studio dongle or software activation code.
+              </description>
+            </release><release version="15.2.3" date="2019-01-24">
+              <description>
+                 This software update improves user interface responsiveness and playback performance for editing and Fairlight audio. DaVinci Resolve 15.2.3 also features better multicam and ganged clip playback, faster saving of projects with live save enabled, more reliable importing of projects from previous versions, improved keyboard shortcuts, more accurate stabilization for videos with horizontal or vertical flips and more. This version requires a DaVinci Resolve Studio dongle or software activation code.
+              </description>
+            </release><release version="15.2.2" date="2018-12-13">
+              <description>
+                 DaVinci Resolve 15.2.2 update addresses viewer performance on Windows systems with Intel GPUs, provides better multicam performance when using time of day timecode, fixes an occasional issue where clip thumbnails would sometimes show an offline frame, features more accurate position controls, properly renders clips with alpha and cropping, improves Fairlight automation and track naming, provides greater stability for Fusion, and addresses issues importing some FLAC, PNG and Panasonic VariCam clips. This update also includes general performance and stability improvements. This version requires a DaVinci Resolve Studio dongle or software activation code.
+              </description>
+            </release><release version="15.2.1" date="2018-11-29">
+              <description>
+                 This software update provides performance improvements for MXF OP1A rendering, keyboard shortcuts, match frame focus, 10-bit DPX playback, optical flow image processing, audio routing, Fusion transform tool offsets and much more. This update also includes general stability improvements and is recommended for all DaVInci Resolve 15 Studio users. This version requires a DaVinci Resolve Studio dongle or software activation code.
+              </description>
+            </release><release version="15.2.0" date="2018-11-14">
+              <description>
+                 This software update features a higher frame rate timeline with edit animations, completely redesigned keyboard customization interface, new active window highlights, a keyword dictionary tool, dup detection, easy timecode entry, simplified compound timeline editing, subframe audio transition editing, Fairlight fader grouping, new FairlightFX multi band compressor and stereo fixer plug-ins, and more. In addition, DaVinci Resolve 15.2 Studio also includes new ACES transform, gamut limiter, beauty and blanking fill ResolveFX plug-ins, along with new support for collaboration setups across subnets. This update also includes general performance and stability improvements. This version requires a DaVinci Resolve dongle or software activation code.
+              </description>
+            </release><release version="15.1.2" date="2018-10-16">
+              <description>
+                 This software update addresses issues with running DaVinci Resolve on case sensitive drive volumes, improves stability on systems running CUDA, makes live save during remote grading sessions more reliable, properly premultiplies RGBA images when using OpenFX plugins. This update also improves Blackmagic RAW setting functionality, makes ResolveFX more reliable on the color page, addresses issues with Fusion paint, Fairlight audio, and dozens of other general performance and stability issues. This version requires a DaVinci Resolve dongle or software activation code.
+              </description>
+            </release><release version="15.1.1" date="2018-09-27">
+              <description>
+                 This software update adds support for joining through edits from the contextual menu, adds scripting APIs for setting output file names when rendering, improves playback performance and more. DaVinci Resolve 15.1.1 Studio update also addresses user reported issues for group grades, output sizing, stereoscopic 3D, Blackmagic RAW white balancing, ResolveFX keyframes and dozens of additional general performance and stability improvements. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="15.1.0" date="2018-09-18">
+              <description>
+                 This software update adds support for the new Blackmagic RAW format to DaVinci Resolve. In addition, DaVinci Resolve 15.1 update also adds new audio ducking features using sidechain compression, support for Fusion compositions outside of the edit timeline, Fusion loader nodes, audio bouncing with effects, source timecode overlays, keywords for markers and more. You can now round trip audio clips to third party audio processing applications from the Fairlight timeline, cache audio clips, deliver supplemental IMF packages, Netflix certified IMF packages, work with stereoscopic 3D EXR files, access frame based metadata and much more. DaVinci Resolve 15.1 Studio adds new collaboration indicators on the edit timeline for clips with color grade changes and Fusion composition updates in collaborative projects. This update also includes general performance and stability improvements. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="15.0.1" date="2018-09-03">
+              <description>
+                 This software update adds support for Dolby Vision™ certification along with fixes and improvements for dynamic project switching, faster save speeds, better text encoding for subtitles, improved RED IPP2 gamut mapping and more. DaVinci Resolve 15.0.1 update also addresses playback issues for Fusion clips with premultiplied alpha, improves HDR10+ support, makes it possible to render to unmapped drives on Windows, and includes additional general performance and stability improvements. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="15.0.0" date="2018-08-13">
+              <description>
+                 This software installs the full shipping version of DaVinci Resolve 15 Studio which features integrated Fusion visual effects and motion graphics, additional Fairlight audio tools and over 300 new features and improvements. This version requires a DaVinci Resolve license dongle or software activation code.
+              </description>
+            </release><release version="14.3.1" date="2018-07-06">
+              <description>
+                 This update improves the performance of Blackmagic Design playback devices when using scopes and improves 4:2:2 output over HDMI. In addition, DaVinci Resolve 14.3.1 update adds the ability to preview stills more reliably when using shared gallery paths with different media storage locations. It also addresses an issue in which gallery stills would sometimes show as blank during collaboration sessions. DaVinci Resolve 14.3.1 includes several general performance and stability improvements and is recommended for all customers currently using DaVinci Resolve 14 on long term projects. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="14.3.0" date="2018-02-02">
+              <description>
+                 This software update adds support for the new Blackmagic URSA Broadcast camera along with support for RAW files from Sony Venice/CineAltaV cameras. In addition, DaVinci Resolve 14.3 Studio update also improves the quality of thumbnails in the media pool on retina displays, adds support for reading Panasonic Varicam metadata when importing footage, can export Sony color space and gamma metadata to MXF files, and addresses an issue with audio delivery. This update also improves reliability when saving files and features other general performance and stability improvements.
+              </description>
+            </release><release version="14.2.1" date="2018-01-23">
+              <description>
+                 This software update includes over 50 stability and general performance improvements, and is recommended for all DaVinci Resolve 14 Studio users. DaVinci Resolve 14.2.1 Studio features better performance on the edit page while generating thumbnails, correct output of 5.1 and 7.1 WAV files, a more reliable progress indicator when generating optimized proxy media, over a dozen Fairlight audio improvements, better Multicam viewer performance, the ability to change multiple clip properties at the same time, new Power Window tracking indicators for frame mode, improved stability for rendering Cineform and H.264, faster ProRes encoding, faster XAVC-I decoding and much more. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="14.2.0" date="2017-12-15">
+              <description>
+                 This software update adds support for monitoring modes with DeckLink 8K Pro, importing audio only AAF clips, lets you name Gallery stills with user defined tags, addresses an issue with audio playback while dynamic trimming, improves Fairlight keyframe editing and more. In addition, this update has many general performance and stability improvements, and is recommended for all DaVinci Resolve 14 Studio users. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="14.1.1" date="2017-11-23">
+              <description>
+                 This software update fixes a bug when detecting Blackmagic Desktop Video hardware, improves monitoring selection of PsF formats, provides better license dongle detection on MacOS High Sierra. In addition, this update has many general performance and stability improvements, and is recommended for all DaVinci Resolve 14 Studio users. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="14.1.0" date="2017-11-13">
+              <description>
+                 This software update adds support for video scopes on the Edit page, user preference presets, improved text rendering, the ability to drag a DaVinci Resolve .drp project file directly into the project manager, and to generate and rediscover optimized proxies in collaborative projects. On the Color page, there is now support for groups in collaborative projects and improved display node graph functionality. For Fairlight audio, this update adds new linked group support for audio tracks, enhanced AC-3 audio decoding on Mac and Windows. In addition, this update adds support for RED IPP2 color processing and GoPro CineForm as caching and optimized media formats, render cache improvements, and a new Project Server application along with general performance and stability enhancements. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="14.0.1" date="2017-10-06">
+              <description>
+                 This software update adds support for HEVC decoding and hardware acceleration on the latest Mac OS, 7.1 audio track types, improved loudness meters, matte indicators on Media Pool thumbnails and support for dynamics for audio buses in the Fairlight mixer. In addition, this update includes dozens of general performance and stability enhancements. This version requires either a DaVinci Resolve dongle or a software activation key.
+              </description>
+            </release><release version="14.0.0" date="2017-09-08">
+              <description>
+                 This software installs DaVinci Resolve 14 Studio which features up to 10x faster editing performance, Fairlight audio post production, multi user collaboration tools, dozens of new filters and effects including automatic facial recognition and more. This version requires a DaVinci Resolve dongle or software activation code.
+              </description>
+            </release><release version="12.5.6" date="2017-06-16">
+              <description>
+                 This software update is for all DaVinci Resolve 12.5 customers. It includes new firmware for the DaVinci Resolve Micro and Mini panels which allows you to adjust button and LCD brightness. In addition it adds support for multi-part EXR decoding, color boost in 3D LUT generation, optimized media for stereoscopic 3D clips, and additional panel control for fast forwarding and rewinding through on the panels. Download now!
+              </description>
+            </release><release version="12.5.5" date="2017-03-02">
+              <description>
+                 This update adds compatibility for the new DaVinci Resolve Micro and DaVinci Resolve Mini hardware control panels, along with support for Red Hat and CentOS 6.8 or 7.2 Linux. This version requires a DaVinci Resolve dongle.
+              </description>
+            </release><release version="12.5.4" date="2016-12-14">
+              <description>
+                 This software update is for DaVinci Resolve Studio and adds support for the Touch Bar on the new Apple MacBook Pro, MP3 decoding on Windows, preserving super white and sub black data when working with ProRes 4:4:4:4, and improved CR2, EXR, and DPX support. Customers working on high dynamic range projects get Rec. 2100 support for DaVinci Resolve color management, new sliders for Dolby Vision analysis data and new IDT and ODT options for customers using ACES workflows. This version requires a DaVinci Resolve dongle.
+              </description>
+            </release><release version="12.5.3" date="2016-10-28">
+              <description>
+                 This software update is for all DaVinci Resolve Studio customers. It adds support for XML version 1.6 so you can import and work with projects from the new Final Cut Pro X. In addition, this update also adds support for ACES 1.0.2 and ACEScct color science, along with improved MXF XAVC encoding, improved AAF importing from Media Composer, and improved Dolby Vision XML exporting. DaVinci Resolve 12.5.3 Studio also adds support for PostgreSQL 9.5.2 on macOS Sierra. Download now!
+              </description>
+            </release><release version="12.5.2" date="2016-09-09">
+              <description>
+                 This software update adds support for additional metadata embedded into the RAW files from URSA Mini cameras running the new operating software, new color space tag support on QuickTime export, Fusion Connect for Linux, additional smart bin options, new color page timeline filtering based on OpenFX plug-ins and more. This version requires a DaVinci Resolve dongle.
+              </description>
+            </release><release version="12.5.1" date="2016-08-11">
+              <description>
+                 This software update adds ProRes decoding on Windows and no longer requires QuickTime 7 for Windows. Trimming and multicam performance is also improved as DaVinci Resolve 12.5.1 now uses its own native 64-bit code to read and write .mov files. DaVinci Resolve Studio customers also get improved 3D  tools, support for copying Dolby Vision grades and more. In addition, new ResolveFX have been added and GPU acceleration has been improved for existing plug-ins. This update also adds support for Sony X-OCN, DNxHR 444 alpha channels, AVCHD .mts clips and more. This version requires a DaVinci Resolve dongle.
+              </description>
+            </release><release version="12.5.0" date="2016-06-08">
+              <description>
+                 This software installs DaVinci Resolve 12.5 Studio professional editing and color correction software. With over 1,000 enhancements and 250 new features, DaVinci Resolve 12.5 Studio features everything found in the free version, plus adds multiple GPU support, 4K mastering, HDR grading, motion blur effects, noise reduction, 3D, multi-user tools and more. This version requires a DaVinci Resolve dongle.
+              </description>
+            </release><release version="12.3.2" date="2016-03-18">
+              <description>
+                 This software update adds support for Blackmagic 4.6K film color science used in the new Blackmagic URSA Mini 4.6K camera. RAW clips from this camera now default to BMD Film color space and gamma, and improvements have been made to the Rec. 709 conversion of this footage.
+              </description>
+            </release><release version="12.3.1" date="2016-02-10">
+              <description>
+                 This software update improves the performance of H.264, H.265, OpenEXR, Varicam, MPEG4 and AVC on both Mac and Windows. It also adds new options for smaller font sizes on burn-ins, ARRI RAW sharpness, RED SDK v6.1 and more.
+              </description>
+            </release><release version="12.2.0" date="2015-12-23">
+              <description>
+                 This software update adds HEVC/H.265 decoding support on OS X, new high dynamic range features such as HDR Hybrid Log Gamma with LUT conversion, updated ST 2084 color science and more.
+              </description>
+            </release><release version="12.1.0" date="2015-11-12">
+              <description>
+                 This software update adds new editing and color correction features such as remote rendering, better smart bin filtering, grading for nested timelines, support for faders on generators and titles, manual keyframing for Power Windows, 10-bit viewers on OS X and more.
+              </description>
+            </release><release version="12.0.1" date="2015-09-24">
+              <description>
+                 This software update includes general performance improvements and enhancements for DaVinci Resolve Studio.
+              </description>
+            </release><release version="12.0.0" date="2015-09-11">
+              <description>
+                 This software installs the full version of DaVinci Resolve 12 Studio and adds support for multiple GPUs, 4K mastering, motion blur effects, temporal and spatial noise reduction, 3D tools, remote and multi user collaboration tools. Requires a DaVinci Resolve dongle.
+              </description>
+            </release><release version="11.3.1" date="2015-05-15">
+              <description>
+                 This software update adds support for DNxHR QuickTime files, along with CUDA 7 and Maxwell GPU compatibility, improved Alexa 65 RAW processing, Alexa and Canon RMF resolution improvements, enhanced title rendering with shadows and more.
+              </description>
+            </release><release version="11.3.0" date="2015-03-30">
+              <description>
+                 This software update includes support for ARRI Alexa 65 and Panasonic V35 IDT cameras, new ACES 1.0 support, DNxHR MXF and Sony XAVC Intra encoding enhancements as well as general performance improvements.
+              </description>
+            </release><release version="11.2.1" date="2015-02-12">
+              <description>
+                 This software update includes general performance improvements and enhancements for DaVinci Resolve. Recommended for all users.
+              </description>
+            </release><release version="11.2.0" date="2015-02-04">
+              <description>
+                 This software update includes amazing new CinemaDNG colorspace algorithms, improved Avid Media Composer 8.3 round tripping, new DNxHR 4K support, DPX 2.0 enhancements and more! Recommended for all DaVinci Resolve and DaVinci Resolve Lite users.
+              </description>
+            </release><release version="11.1.3" date="2014-12-10">
+              <description>
+                 This software update includes general performance improvements and enhancements for DaVinci Resolve and DaVinci Resolve Lite. Recommended for all users.
+              </description>
+            </release><release version="11.1.2" date="2014-12-04">
+              <description>
+                 This update provides minor bug fixes and enhancements including improved playback performance, tracker and render stability as well as enhanced scope trace intensity and more. Supports Mac OS X 10.10. Recommended for all users.
+              </description>
+            </release><release version="11.1.1" date="2014-10-31">
+              <description>
+                 This update provides minor performance enhancements including XML improvements for FCP X importing of color data, improved stability for corrupt .dng files as well as support for the new Panasonic VLUT 3D LUT format. Supports Mac OS X 10.10. Recommended for all users.
+              </description>
+            </release><release version="11.1.0" date="2014-10-02">
+              <description>
+                 This update provides new editing features including gap trimming, independent track heights, swap edits, full screen timeline view, improved opacity sliders on video tracks and much more. Has support for Mac OS X 10.10.
+              </description>
+            </release><release version="11.0.0" date="2014-08-05">
+              <description>
+                 DaVinci Resolve 11 includes professional online video editing, new photographer friendly color correction tools, revolutionary ColorMatch test chart auto-grading, on-set media management and more!
+              </description>
+            </release><release version="10.1.5" date="2014-05-09">
+              <description>
+                 This update includes CUDA 6.0 support, camera file enhancements for RED and ARRI cameras as well as minor bug fixes.
+              </description>
+            </release>
+  </releases>
+</component>

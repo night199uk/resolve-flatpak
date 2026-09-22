@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DaVinci Resolve Studio
+Name[en_US]=DaVinci Resolve Studio
+GenericName=DaVinci Resolve Studio
+Comment=Revolutionary new tools for editing, visual effects, color correction and professional audio post production, all in a single application!
+Exec=/app/bin/resolve-studio.py --run-resolve %U
+Icon=com.blackmagic.ResolveStudio
+Terminal=false
+MimeType=application/x-resolveproj;application/x-resolvebin;application/x-resolvetimeline;application/x-resolvetemplatebundle;application/x-resolvedbkey;
+StartupNotify=true
+Categories=AudioVideo
+PrefersNonDefaultGPU=true

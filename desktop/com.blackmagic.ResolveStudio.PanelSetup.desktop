@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DaVinci Resolve Panels Setup
+Exec=/app/bin/resolve-studio.py --run-panel-setup
+Icon=com.blackmagic.ResolveStudio.PanelSetup
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo
+PrefersNonDefaultGPU=true

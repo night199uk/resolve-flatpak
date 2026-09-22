@@ -1,26 +1,40 @@
 ####
-# Flatpak Configuration for building DaVinci Resolve
+# Meta-Flatpak Configuration for DaVinci Resolve Studio
 #
+# This Flatpak contains only the installer/launcher script.
+# DaVinci Resolve Studio is downloaded and installed on first launch.
 ####
 app-id: com.blackmagic.ResolveStudio
-runtime: org.freedesktop.Platform
-runtime-version: &runtime-version '25.08'
-sdk: org.freedesktop.Sdk
-add-extensions:
-  com.blackmagic.ResolveStudio.ioplugin:
-    version: '1.0'
-    directory: IOPlugins
-    subdirectories: true
-    no-autodownload: true
-    autodelete: true
+runtime: org.kde.Platform
+runtime-version: &runtime-version '6.11'
+sdk: org.kde.Sdk
+base: io.qt.PySide.BaseApp
+base-version: '6.11'
+command: /app/bin/resolve-studio.py
+
+# PySide6 cleanup: the BaseApp's cleanup.sh removes WebEngine + NumPy at 
+# app-build time when these env vars are set.
+build-options:
+  env:
+    BASEAPP_REMOVE_WEBENGINE: "1"
+    BASEAPP_REMOVE_PYWEBENGINE: "1"
+    BASEAPP_DISABLE_NUMPY: "1"
+
 finish-args:
-  - --share=ipc
-  - --share=network
-  - --socket=pulseaudio
+  # Display server access
   - --socket=x11
+  - --share=ipc
+  
+  # Network access for downloading DaVinci Resolve
+  - --share=network
+  
+  # Audio access
+  - --socket=pulseaudio
+  
+  # GPU access for DaVinci Resolve
   - --device=dri
-  - --device=usb
-  - --usb=vnd:096e
+  
+  # File system access for user data
   - --filesystem=xdg-desktop
   - --filesystem=xdg-documents
   - --filesystem=xdg-download
@@ -30,28 +44,39 @@ finish-args:
   - --filesystem=xdg-videos
   - --filesystem=/media
   - --filesystem=/run/media
+  - --filesystem=xdg-run/gvfs
   - --filesystem=/mnt
+  
+  # Persistent data directories
   - --persist=.local/share/DaVinciResolve
   - --persist=Videos/CacheClip
   - --persist=Videos/.gallery
   - --persist=Documents/BlackmagicDesign
-  # https://www.reddit.com/r/Fedora/comments/12z32r1/davinci_resolve_libpango_undefined_symbol_g/
-  # - --env=LD_PRELOAD=/lib/x86_64-linux-gnu/libglib-2.0.so.0 /lib/x86_64-linux-gnu/libgio-2.0.so.0 /lib/x86_64-linux-gnu/libgmodule-2.0.so.0 /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+  
+  # GPU compute environment
   - --env=RUSTICL_ENABLE=radeonsi,iris,nouveau
-#  - --env=OCL_ICD_VENDORS=rusticl.icd
 
-command: /app/bin/resolve.sh
+  # Force the installer to use X11 since DaVinci
+  # doesn't support Wayland yet.
+  - --env=QT_QPA_PLATFORM=xcb
+
 modules:
+  # OpenGL Utility Library (required by DaVinci Resolve)
   - shared-modules/glu/glu-9.json
-  # libcrypt.so.1 no longer provided by the runtime.
+
+  # Ship libcrypt.so.1 with flatpak as not provided by runtime or by Blackmagic.
   # See https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/issues/1708
   - name: libxcrypt
     buildsystem: autotools
     config-opts: ["--enable-obsolete-api=glibc"]
+    build-options:
+      cflags: "-Wno-error=discarded-qualifiers"
     sources:
       - type: git
         url: https://github.com/besser82/libxcrypt.git
-        tag: v4.4.38
+        tag: v4.5.2
+
+  # Intel Threading Building Blocks (optional, disabled by default)
   - name: onetbb
     disabled: true
     buildsystem: cmake-ninja
@@ -62,48 +87,162 @@ modules:
       - type: git
         url: https://github.com/oneapi-src/oneTBB
         tag: v2022.2.0
-  #Build libcxx and ship as a library with Resolve as BM is outdated and segfaults on some setups. Disabled by default.
-  # - name: libcxx
-  #  disabled: true
-  #  buildsystem: cmake-ninja
-  #  builddir: true
-  #  subdir: runtimes
-  #  config-opts:
-  #    - -DCMAKE_BUILD_TYPE=Release
-  #    - -DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi
-  #    - -DLLVM_TARGETS_TO_BUILD=X86
-  #    - -Wno-dev
-  #  sources:
-  #    - type: git
-  #      url: https://github.com/llvm/llvm-project.git
-  #      tag: llvmorg-17.0.6
-  - name: resolve
+
+  # squashfs-tools for extracting the DaVinci Resolve installer
+  - name: squashfs-tools
     buildsystem: simple
-    build-options:
-      build-args:
-        - --share=network
     build-commands:
-      - install -Dm644 logo.png /app/share/icons/hicolor/scalable/apps/com.blackmagic.ResolveStudio.png
-      - |
-        ./run_complete_installation.sh --studio
+      - make -C squashfs-tools
+      - install -Dm755 squashfs-tools/unsquashfs /app/bin/unsquashfs
+    sources:
+      - type: archive
+        url: https://github.com/plougher/squashfs-tools/archive/refs/tags/4.6.1.tar.gz
+        sha256: 9c4974e07c61547dae14af4ed1f358b7d04618ae194e54d6be72ee126f0d2f53
+
+  - name: python3-requests
+    buildsystem: simple
+    build-commands:
+      - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+        --prefix=${FLATPAK_DEST} "requests" --no-build-isolation
     sources:
       - type: file
-        path: python/build_metainfo.py
+        url: https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl
+        sha256: 62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775
       - type: file
-        path: python/main.py
+        url: https://files.pythonhosted.org/packages/cc/61/d01fc49b8dea277640b55a9e15960dbca9fdc8c9fde18e572d39c59f4019/charset_normalizer-3.5.1-py3-none-any.whl
+        sha256: 6df0ec430f9a831772c23ca5a224cba36517a58a84bb32c32bb59a9fa67c47f6
       - type: file
-        path: python/resolve_download.py
+        url: https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl
+        sha256: ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c
       - type: file
-        path: python/version.py
+        url: https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl
+        sha256: 2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0
       - type: file
-        path: shell/setup_resolve.sh
+        url: https://files.pythonhosted.org/packages/92/9d/c4e665119135114480843e7ab388fa94d8480650450e6f8e26b70d323a4c/urllib3-2.8.0-py3-none-any.whl
+        sha256: 0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3
+
+  # Main installer module
+  - name: installer
+    buildsystem: simple
+    build-commands:
+      # Install the installer script and modules
+      - install -Dm755 installer/main.py /app/bin/resolve-studio.py
+      - install -Dm644 installer/api.py /app/bin/api.py
+      - install -Dm644 installer/config.py /app/bin/config.py
+      - install -Dm644 installer/download.py /app/bin/download.py
+      - install -Dm644 installer/export.py /app/bin/export.py
+      - install -Dm644 installer/gui.py /app/bin/gui.py
+      - install -Dm644 installer/install.py /app/bin/install.py
+      - install -Dm644 installer/launcher.py /app/bin/launcher.py
+      - install -Dm644 installer/udev.py /app/bin/udev.py
+      
+      # Install desktop files
+      - install -Dm644 desktop/com.blackmagic.ResolveStudio.desktop /app/share/applications/com.blackmagic.ResolveStudio.desktop
+      - install -Dm644 desktop/com.blackmagic.ResolveStudio.RAWPlayer.desktop /app/share/applications/com.blackmagic.ResolveStudio.RAWPlayer.desktop
+      - install -Dm644 desktop/com.blackmagic.ResolveStudio.RAWSpeedTest.desktop /app/share/applications/com.blackmagic.ResolveStudio.RAWSpeedTest.desktop
+      - install -Dm644 desktop/com.blackmagic.ResolveStudio.PanelSetup.desktop /app/share/applications/com.blackmagic.ResolveStudio.PanelSetup.desktop
+      - install -Dm644 desktop/com.blackmagic.ResolveStudio.RemoteMonitoring.desktop /app/share/applications/com.blackmagic.ResolveStudio.RemoteMonitoring.desktop
+      
+      # Install MIME type definitions
+      - install -Dm644 mime/blackmagicraw.xml /app/share/mime/packages/blackmagicraw.xml
+      - install -Dm644 mime/blackmagicresolve.xml /app/share/mime/packages/blackmagicresolve.xml
+      
+      # Install metainfo
+      - install -Dm644 metainfo/com.blackmagic.ResolveStudio.metainfo.xml /app/share/metainfo/com.blackmagic.ResolveStudio.metainfo.xml
+      
+      # Install logo
+      - install -Dm644 logo.png /app/share/icons/hicolor/scalable/apps/com.blackmagic.ResolveStudio.png
+    sources:
       - type: file
-        path: shell/setup_directories.sh
+        path: installer/api.py
+        dest: installer
       - type: file
-        path: shell/resolve.sh
+        path: installer/config.py
+        dest: installer
       - type: file
-        path: run_complete_installation.sh
+        path: installer/download.py
+        dest: installer
       - type: file
-        path: requirements.txt
+        path: installer/export.py
+        dest: installer
+      - type: file
+        path: installer/gui.py
+        dest: installer
+      - type: file
+        path: installer/install.py
+        dest: installer
+      - type: file
+        path: installer/launcher.py
+        dest: installer
+      - type: file
+        path: installer/main.py
+        dest: installer
+      - type: file
+        path: installer/udev.py
+        dest: installer
+      - type: file
+        path: desktop/com.blackmagic.ResolveStudio.desktop
+        dest: desktop
+      - type: file
+        path: desktop/com.blackmagic.ResolveStudio.PanelSetup.desktop
+        dest: desktop
+      - type: file
+        path: desktop/com.blackmagic.ResolveStudio.RAWPlayer.desktop
+        dest: desktop
+      - type: file
+        path: desktop/com.blackmagic.ResolveStudio.RAWSpeedTest.desktop
+        dest: desktop
+      - type: file
+        path: desktop/com.blackmagic.ResolveStudio.RemoteMonitoring.desktop
+        dest: desktop
+      - type: file
+        path: mime/blackmagicraw.xml
+        dest: mime
+      - type: file
+        path: mime/blackmagicresolve.xml
+        dest: mime
+      - type: file
+        path: metainfo/com.blackmagic.ResolveStudio.metainfo.xml
+        dest: metainfo
+      - type: file
+        path: icons/hicolor/128x128/mimetypes/application-x-resolvedbkey.png
+        dest: icons/hicolor/128x128/mimetypes
+      - type: file
+        path: icons/hicolor/128x128/mimetypes/application-x-resolvebin.png
+        dest: icons/hicolor/128x128/mimetypes
+      - type: file
+        path: icons/hicolor/128x128/mimetypes/application-x-resolvetimeline.png
+        dest: icons/hicolor/128x128/mimetypes
+      - type: file
+        path: icons/hicolor/128x128/mimetypes/application-x-resolvetemplatebundle.png
+        dest: icons/hicolor/128x128/mimetypes
+      - type: file
+        path: icons/hicolor/128x128/mimetypes/application-x-resolveproj.png
+        dest: icons/hicolor/128x128/mimetypes
+      - type: file
+        path: icons/hicolor/128x128/apps/com.blackmagic.ResolveStudio.png
+        dest: icons/hicolor/128x128/apps
+      - type: file
+        path: icons/hicolor/128x128/apps/com.blackmagic.ResolveStudio.PanelSetup.png
+        dest: icons/hicolor/128x128/apps
+      - type: file
+        path: icons/hicolor/256x256/mimetypes/application-x-braw-sidecar.png
+        dest: icons/hicolor/256x256/mimetypes
+      - type: file
+        path: icons/hicolor/256x256/mimetypes/application-x-braw-clip.png
+        dest: icons/hicolor/256x256/mimetypes
+      - type: file
+        path: icons/hicolor/256x256/apps/com.blackmagic.ResolveStudio.RAWSpeedTest.png
+        dest: icons/hicolor/256x256/apps
+      - type: file
+        path: icons/hicolor/256x256/apps/com.blackmagic.ResolveStudio.RAWPlayer.png
+        dest: icons/hicolor/256x256/apps
+      - type: file
+        path: icons/hicolor/48x48/mimetypes/application-x-braw-sidecar.png
+        dest: icons/hicolor/48x48/mimetypes
+      - type: file
+        path: icons/hicolor/48x48/mimetypes/application-x-braw-clip.png
+        dest: icons/hicolor/48x48/mimetypes
       - type: file
         path: logo.png
+

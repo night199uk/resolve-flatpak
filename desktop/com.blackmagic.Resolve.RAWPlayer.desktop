@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Blackmagic RAW Player
+Exec=/app/bin/resolve.py --run-brawplayer %U
+Icon=com.blackmagic.Resolve.RAWPlayer
+Terminal=false
+MimeType=application/x-braw-clip;application/x-braw-sidecar;
+StartupNotify=true
+Categories=AudioVideo
+PrefersNonDefaultGPU=true
