@@ -1,98 +1,117 @@
+# MAJOR UPDATE:
+I have completely rewritten this Flatpak support with a little help from
+Claude to use a Qt-based meta-installer style approach similar to Steam
+or Discord. I had initially hoped to use Flatpak's extra-data approach,
+however bugs in Flatpak's implementation of extra-data related to very
+large downloads (>8GB) pushed me away from this.
 
+I may not have carried over all fixes, but this approach should be much
+more strategic and allow distribution of this package via e.g. Flathub
+and Flatpak, opening it up to more users.
+
+Contributions are welcome and apologies if any previous contributions
+were lost in the migration.
 
 resolve-flatpak
 ===============
 
-This repo allows you to package DaVinci Resolve as a Flatpak for use on Linux Flatpak
-based systems, especially e.g. Fedora Silverblue where there aren't easier installation
-options. 
+This Flatpak installs DaVinci Resolve using Flatpak. 
 
-It's still a work-in-progress; but "works-for-me[tm]" right now.
+Technically it is a Qt-based installer, which installs DaVinci Resolve
+from the Blackmagic website on-demand.  It manages the installation,
+checks for updates on run, etc. The Flatpak itself contains no Blackmagic
+binaries or copyright material; and thus can be distributed on Flathub,
+Flatpark etc. It provides the illusion of installing Resolve from Flatpak
+and makes installation simpler for users running - e.g. Silverblue and
+other atomic distributions, and anyone who operates Flatpak-first.
+
+The Flatpak installation is performed in the Flatpak run directory; e.g.
+/home/<user>/.var/app/com.blackmagic.Resolve/data
+
+This, each user will manage their own Resolve installation.
 
 Usage
 -----
 
-1. If you have appimagelauncherd (the AppImage Launcher daemon) installed and enabled, you NEED to temporarely disable it (either through systemctl or through the AppImage Launcher GUI) as it conflicts with flatpak-builder during the .run file repackaging process.
-
-2. Clone this repo with: `git clone https://github.com/pobthebuilder/resolve-flatpak.git --recursive`
-By default, com.blackmagic.Resolve.yaml is configured to package the latest version of Resolve (18.5 Beta 3 at the time of writing).
-
-3. Build your package, and export to a distributable single file installer:
-
-#### Free
+1. **Download the latest DaVinciResolve.flatpak or DaVinciResolveStudio.flatpak from the releases page.**
+2. **Install**
+3. **Run DaVinci Resolve [or Studio].**
+4. **The installer will prompt you to install the latest version of DaVinci Resolve [or Studio].**
+5. **If you need udev rules for USB keys or other Blackmagic USB devices:**
+This must be done *after* the real DaVinci Resolve has been installed and first run.
 ```
+flatpak run com.blackmagic.Resolve --print-udev-rules | sudo sh
+```
+or
+```
+flatpak run com.blackmagic.ResolveStudio --print-udev-rules | sudo sh
+```
+
+Plugins
+-------
+I have not yet updated the ffmpeg support to this latest packaging mechanism.
+
+Advanced Stuff, Tools, and Compiling
+------------------------------------
+
+## Re-building the Flatpaks
+
+1. Rebuild the top-level packages, and export to distributable single file installers.
+NOTE: this does not package the resolve binaries; only the installer. The
+installer will always obtain the Resolve binaries on run.
+
+#### 
+```
+git clone https://github.com/pobthebuilder/resolve-flatpak.git --recursive
+
+# This line updates the static resources like icons, desktop files, etc
+# that are packaged in the actual Flatpak.
+installer/main.py --export-flatpak-resources .
+
 flatpak-builder --install-deps-from=flathub --force-clean --repo=.repo .build-dir com.blackmagic.Resolve.yaml
-```
+flatpak build-bundle .repo DaVinciResolve.flatpak com.blackmagic.Resolve --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 
-To simply install the built version:
-```
-flatpak --user remote-add --no-gpg-verify resolve-repo .repo
-flatpak --user install resolve-repo com.blackmagic.Resolve
-```
-
-To build a redistruble single file package:
-```
-flatpak build-bundle .repo resolve.flatpak com.blackmagic.Resolve --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
-```
-
-#### Studio
-```
 flatpak-builder --install-deps-from=flathub --force-clean --repo=.repo .build-dir com.blackmagic.ResolveStudio.yaml
+flatpak build-bundle .repo DaVinciResolveStudio.flatpak com.blackmagic.ResolveStudio --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 ```
 
-To simply install the built version:
-```
-flatpak --user remote-add --no-gpg-verify resolve-repo .repo
-flatpak --user install resolve-repo com.blackmagic.ResolveStudio
-```
+## Finding download IDs to install specific versions of Resolve
 
-To build a redistruble single file package:
+#### If you already have this Flatpak installed
+This will list only the downloads for the version you have installed (Free or Studio):
 ```
-flatpak build-bundle .repo resolve.flatpak com.blackmagic.ResolveStudio --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+flatpak run com.blackmagic.Resolve --list-downloads
 ```
-
-4. Enjoy.
-
-## udev rules (Resolve Studio)
-On some distros, you may need to add udev rules to enable Resolve Studio to access your USB licence key, otherwise Resolve will segfault at the "Checking Licences..." splash screen. An example udev rule is below:
-
+or
 ```
-# Allow Flatpak apps to access USB devices with vendor ID 096e (Feitan Technologies), needed by DaVinci Resolve Studio when using USB licence keys
-# Place this file in /etc/udev/rules.d/
-# Recommended file name: 99-davinci-usb.rules
-
-SUBSYSTEM=="usb", ATTR{idVendor}=="096e", TAG+="uaccess"
-SUBSYSTEM=="usb", ATTR{idVendor}=="096e", MODE="0664", GROUP="plugdev"
+flatpak run com.blackmagic.ResolveStudio --list-downloads
 ```
 
-## Plugins
-Davinci Resolve Flatpak now supports bundling IOPlugins as Flatpak Extensions so they can be trivially installed.
-
-For an example; the publically available ffmpeg IOPlugin is available packaged as a Flatpak extension here:
-https://github.com/pobthebuilder/resolve-ffmpeg-plugin-flatpak
-
-## Finding explicit Download IDs (for download_resolve.sh)
-#### Studio:
+#### Directly from this repo:
 
 ```
-curl -o- https://www.blackmagicdesign.com/api/support/nz/downloads.json |
-    jq -r '.downloads[]
-            | select(.urls["Linux"] != null)
-            | select(.urls["Linux"][0]["product"] == "davinci-resolve-studio")
-            | [.urls["Linux"][0].downloadTitle, .urls["Linux"][0].downloadId]
-            | @tsv'
+git clone https://github.com/night199uk/resolve-flatpak.git --recursive
+cd resolve-flatpak
+installer/main.py --list-downloads [--studio]
 ```
 
-#### Free:
+## Installing a specific version of Resolve (using a download ID)
+
+Install this Flatpak but do not install Resolve itself.
+Or - if you already installed Resolve and want to go back to an older version:
 
 ```
-curl -o- https://www.blackmagicdesign.com/api/support/nz/downloads.json |
-    jq -r '.downloads[]
-            | select(.urls["Linux"] != null)
-            | select(.urls["Linux"][0]["product"] == "davinci-resolve")
-            | [.urls["Linux"][0].downloadTitle, .urls["Linux"][0].downloadId]
-            | @tsv'
+rm -rf ~/.var/app/com.blackmagic.com/
 ```
+
+Get a download ID for the version you want to install (see above).
+
+Now:
+```
+flatpak run com.blackmagic.Resolve --download_id <download_id>
+```
+
+This will install and run the version you want.
 
 ## Licensing
 The icon in logo.png is licensed under the Creative [Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/deed.en) and fetched from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DaVinci_Resolve_Studio.png). It was only cropped afterwards.
@@ -101,3 +120,4 @@ The icon in logo.png is licensed under the Creative [Commons Attribution-Share A
 
 - [Flathub forum : DaVinci Resolve Feature Requests](https://discourse.flathub.org/t/davinci-resolve-flatpak-request/842)
 - [blackmagicdesign forum : DaVinci Resolve Flatpak request](https://forum.blackmagicdesign.com/viewtopic.php?f=33&t=186259)
+

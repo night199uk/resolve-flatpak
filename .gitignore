@@ -4,3 +4,4 @@
 venv
 .repo
 .flatpak-builder
+__pycache__/

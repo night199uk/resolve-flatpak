@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-braw-clip">
+    <comment>Blackmagic RAW Clip</comment>
+    <glob pattern="*.braw"/>
+  </mime-type>
+  <mime-type type="application/x-braw-sidecar">
+    <comment>Blackmagic RAW Sidecar</comment>
+    <glob pattern="*.sidecar"/>
+  </mime-type>
+</mime-info>

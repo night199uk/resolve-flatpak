@@ -2,7 +2,10 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
 
 jobs:
   flatpak:
@@ -12,7 +15,7 @@ jobs:
         matrix:
             file: [Resolve, ResolveStudio]
     container:
-      image: bilelmoussaoui/flatpak-github-actions:freedesktop-22.08
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
       options: --privileged
     steps:
     - id: string

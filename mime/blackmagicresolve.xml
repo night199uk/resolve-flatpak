@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-resolveproj">
+    <comment>DaVinci Resolve Project</comment>
+    <glob pattern="*.drp"/>
+  </mime-type>
+  <mime-type type="application/x-resolvebin">
+    <comment>DaVinci Resolve Bin</comment>
+    <glob pattern="*.drb"/>
+  </mime-type>
+  <mime-type type="application/x-resolvetimeline">
+    <comment>DaVinci Resolve Timeline</comment>
+    <glob pattern="*.drt"/>
+  </mime-type>
+  <mime-type type="application/x-resolvetemplatebundle">
+    <comment>DaVinci Resolve Template Bundle</comment>
+    <glob pattern="*.drfx"/>
+  </mime-type>
+  <mime-type type="application/x-resolvedbkey">
+    <comment>DaVinci Resolve Database Access Key</comment>
+    <glob pattern="*.resolvedbkey"/>
+  </mime-type>
+</mime-info>

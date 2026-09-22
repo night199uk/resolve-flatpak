@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DaVinci Remote Monitoring
+Exec=/app/bin/resolve.py --run-remote-monitoring
+Icon=com.blackmagic.Resolve.RemoteMonitoring
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo
+PrefersNonDefaultGPU=true

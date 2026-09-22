@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Blackmagic RAW Speed Test
+Exec=/app/bin/resolve-studio.py --run-brawspeedtest
+Icon=com.blackmagic.ResolveStudio.RAWSpeedTest
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo
+PrefersNonDefaultGPU=true
