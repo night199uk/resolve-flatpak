@@ -230,7 +230,12 @@ def install_application(dest, report, cancel_event, prefix=None, studio=None, ve
         def copy_payload():
             # Common directories for all versions
             dirs = ["bin", "Control", "DaVinci Control Panels Setup", "Developer", 
-                    "docs", "Fusion", "graphics", "libs", "LUT", "Onboarding", "plugins", "UI_Resource"]
+                    "docs", "Fusion", "graphics", "libs", "LUT", "Onboarding", "plugins", "UI_Resource",
+                    # bin/ResolvePython is a symlink to ../ResolvePython/ResolvePython.
+                    # The interpreter tree it points at was never copied, so the
+                    # symlink shipped dangling and aborted upgrades when the next
+                    # payload tried to recreate it. Copy the tree it references.
+                    "ResolvePython"]
             
             # Version 18+: adds Certificates and Fairlight Studio Utility
             if major_version >= 18:
@@ -248,6 +253,13 @@ def install_application(dest, report, cancel_event, prefix=None, studio=None, ve
                 else:
                     dirs.append("Technical Documentation")
             
+            # Version 21: the payload ships Apple Immersive and Immersive assets.
+            # Copy them when present; make_dirs() already guarantees the
+            # directories exist (empty) when a payload does not ship them. This
+            # mirrors makeResolveDeb's process_21().
+            if major_version >= 21:
+                dirs.extend(["Apple Immersive", "Immersive"])
+
             for rel in dirs:
                 src = squashfs_root / rel
                 if src.exists():
