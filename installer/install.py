@@ -16,9 +16,40 @@ class InstallationCancelled(Exception):
     """Raised by the worker thread when the user cancels the install."""
 
 
+def _remove_path(path):
+    """Remove `path` whatever its type; a no-op when it does not exist."""
+    if path.is_symlink() or path.is_file():
+        path.unlink()
+    elif path.is_dir():
+        shutil.rmtree(path)
+
+
 def _copy_tree(src, dst):
-    """cp -rp equivalent: recursive copy preserving symlinks and metadata."""
-    shutil.copytree(src, dst, dirs_exist_ok=True, symlinks=True)
+    """cp -rp equivalent: merge `src` into `dst`, preserving symlinks and metadata.
+
+    Merges entry by entry instead of delegating to
+    ``shutil.copytree(..., dirs_exist_ok=True)``.  copytree only tolerates an
+    existing destination *directory*; for any other entry that is already
+    present it recreates it unconditionally, so ``os.symlink`` dies with
+    ``FileExistsError: [Errno 17] File exists``.  An upgrade copies the new
+    payload over the previous release, whose ``bin/`` already holds symlinks
+    such as ``ResolvePython``, so that error aborted every update.  Clear the
+    existing destination entry first so re-running is idempotent.
+    """
+    src = Path(src)
+    dst = Path(dst)
+    dst.mkdir(parents=True, exist_ok=True)
+    with os.scandir(src) as entries:
+        for entry in entries:
+            target = dst / entry.name
+            if entry.is_symlink():
+                _remove_path(target)
+                os.symlink(os.readlink(entry.path), target)
+            elif entry.is_dir():
+                _copy_tree(Path(entry.path), target)
+            else:
+                _remove_path(target)
+                shutil.copy2(entry.path, target)
 
 
 def _make_symlink(target, link):

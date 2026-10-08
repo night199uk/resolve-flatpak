@@ -12,6 +12,7 @@ Thread → UI marshalling uses Qt queued signals instead of ``GLib.idle_add`` /
 
 import threading
 import time
+import traceback
 import urllib
 
 from PySide6.QtCore import QObject, QTimer, Qt, Signal
@@ -20,6 +21,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMainWindow,
+    QPlainTextEdit,
     QProgressBar,
     QPushButton,
     QVBoxLayout,
@@ -43,8 +45,8 @@ class _InstallerSignals(QObject):
     thread via automatic queued connections (safe cross-thread marshalling).
     """
 
-    report = Signal(str, object)      # text, fraction (None => pulse; else 0..1)
-    finish = Signal(bool, str, str)   # cancelled, message, css_class
+    report = Signal(str, object)          # text, fraction (None => pulse; else 0..1)
+    finish = Signal(bool, str, str, str)  # cancelled, message, css_class, details
 
 
 class InstallerWindow(QMainWindow):
@@ -52,8 +54,7 @@ class InstallerWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(config.APP_NAME)
         self.resize(650, 220)
-        self.setMinimumSize(650, 220)
-        self.setMaximumSize(650, 220)
+        self.setMinimumSize(520, 200)
 
         self._app_id = app_id
         self.cancel_event = threading.Event()
@@ -86,6 +87,24 @@ class InstallerWindow(QMainWindow):
         self.detail_label.setWordWrap(True)
         self.detail_label.setStyleSheet("color: #888; font-size: 11px;")
 
+        # Failure output goes here, not into the status QLabel. A read-only
+        # QPlainTextEdit is selectable (mouse, keyboard, right-click -> Copy)
+        # and scrolls, so the full error and traceback stay readable even when
+        # they are long. Hidden until a failure needs it; sharing the step
+        # number in `step_label` keeps the summary visible above it.
+        self.details = QPlainTextEdit()
+        self.details.setObjectName("details")
+        self.details.setReadOnly(True)
+        self.details.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
+        self.details.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+            | Qt.TextInteractionFlag.TextSelectableByKeyboard
+        )
+        mono = self.details.font()
+        mono.setFamily("monospace")
+        self.details.setFont(mono)
+        self.details.setVisible(False)
+
         self.button = QPushButton("Cancel")
         self.button.setEnabled(False)
         self.button.clicked.connect(self._on_button_clicked)
@@ -97,6 +116,7 @@ class InstallerWindow(QMainWindow):
         layout.addWidget(self.step_label)
         layout.addWidget(self.progress)
         layout.addWidget(self.detail_label)
+        layout.addWidget(self.details, 1)
 
         button_row = QHBoxLayout()
         button_row.addStretch(1)
@@ -190,7 +210,7 @@ class InstallerWindow(QMainWindow):
         except InstallationCancelled:
             return self._finish(True, "Cancelled", "error")
         except Exception as exc:
-            self._finish(False, f"Failed: {exc}", "error")
+            self._finish(False, f"Failed: {exc}", "error", traceback.format_exc())
 
     def _step(self, index):
         """Return a `report(text, fraction)` bound to step number `index`."""
@@ -238,10 +258,10 @@ class InstallerWindow(QMainWindow):
         self.progress.setValue(value)
 
     # -- completion --------------------------------------------------------
-    def _finish(self, cancelled, message, css_class):
-        self._signals.finish.emit(cancelled, message, css_class)
+    def _finish(self, cancelled, message, css_class, details=""):
+        self._signals.finish.emit(cancelled, message, css_class, details)
 
-    def _on_finish(self, cancelled, message, css_class):
+    def _on_finish(self, cancelled, message, css_class, details):
         if self._finished:
             return
         self._finished = True
@@ -255,8 +275,23 @@ class InstallerWindow(QMainWindow):
             self.progress.setRange(0, 100)
             self.progress.setValue(0)
             self.step_label.setStyleSheet("color: #e01b24; font-weight: bold;")
+            if details:
+                self._show_details(details)
         self.button.setText("Close")
         self.button.setEnabled(True)
+
+    def _show_details(self, details):
+        """Reveal the full, copyable failure output and enlarge the window."""
+        self.detail_label.setVisible(False)
+        self.details.setPlainText(details)
+        self.details.setVisible(True)
+        # Grow so a typical traceback is readable without scrolling; the view
+        # still scrolls for longer output. `selectAll` pre-selects the text so
+        # a plain Ctrl+C copies it without the user having to drag first.
+        self.setMinimumSize(760, 460)
+        self.resize(820, 560)
+        self.details.setFocus()
+        self.details.selectAll()
 
 
 class InstallerApp:
