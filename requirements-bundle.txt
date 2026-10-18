@@ -1,0 +1,11 @@
+# Dependencies for the self-contained FlatPark bundle (see build-bundle.sh).
+#
+# Pinned so the released tarball is reproducible from this file. PySide6-
+# Essentials (not the PySide6 meta-package) is deliberate: the installer only
+# uses QtCore and QtWidgets, and pulling in the Addons wheel would triple the
+# size of the extra-data the user downloads.
+PySide6-Essentials==6.11.2
+requests==2.34.2
+
+# Build-only.
+PyInstaller==6.22.3

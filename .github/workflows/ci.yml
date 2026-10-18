@@ -44,9 +44,32 @@ jobs:
         name: ${{ matrix.config.key }}.flatpak
         path: ${{ matrix.config.key }}.flatpak
 
+  # The self-contained installer/launcher tarball consumed by FlatPark as
+  # extra-data (see build-bundle.sh). Built on every run so a PR that breaks the
+  # bundle is caught, and attached to the release on a tag.
+  bundle:
+    name: "FlatPark bundle"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Build the PyInstaller bundle
+      run: ./build-bundle.sh
+
+    - name: Upload bundle artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: flatpark-bundle
+        path: resolve-flatpak-*.tar.gz
+        if-no-files-found: error
+
   # If the action was a git tag, generate a new release for the tag.
   release:
-    needs: build
+    needs: [build, bundle]
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
 
@@ -58,11 +81,18 @@ jobs:
           pattern: davinci*.flatpak
           merge-multiple: true
 
+      - name: Download FlatPark bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: flatpark-bundle
+          merge-multiple: true
+
       # Safely create the release and upload all assets at once
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
-          files: davinci*.flatpak
+          files: |
+            davinci*.flatpak
+            resolve-flatpak-*.tar.gz
           generate_release_notes: true
-

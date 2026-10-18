@@ -12,6 +12,7 @@ Run:  python3 main.py --help
 """
 
 import argparse
+import os
 import sys
 import textwrap
 from pathlib import Path
@@ -22,6 +23,26 @@ from gui import InstallerApp
 from export import export_flatpak_resources
 from launcher import launch_application
 from udev import print_udev_rules
+
+
+def _resolve_edition(called_name, arg_studio):
+    """Decide free vs Studio.
+
+    Order of precedence:
+      1. RESOLVE_STUDIO=1/0 in the environment (a frozen bundle runs under a
+         single executable name, so this is how the packaging selects it),
+      2. the invoked script name (``resolve-studio.py`` -> Studio),
+      3. the ``--studio`` flag.
+    """
+    env = os.environ.get("RESOLVE_STUDIO", "").strip().lower()
+    if env in ("1", "true", "yes", "on"):
+        return True
+    if env in ("0", "false", "no", "off"):
+        return False
+    if called_name == "resolve-studio.py":
+        return True
+    return bool(arg_studio)
+
 
 def main():
     called_name = Path(sys.argv[0]).name
@@ -49,8 +70,7 @@ def main():
     ))
     
     # Installation options
-    if called_name == "main.py":
-      parser.add_argument("--studio", action="store_true", help="Install DaVinci Resolve Studio")
+    parser.add_argument("--studio", action="store_true", help="Install DaVinci Resolve Studio")
 
     parser.add_argument("--install", action="store_true", help="Open the standalone installer GUI")
     parser.add_argument("--list-downloads", action="store_true", help="List available downloads and exit")
@@ -73,19 +93,11 @@ def main():
     parser.add_argument("--run-remote-monitoring", action="store_true", help="Launch DaVinci Remote Monitoring")
     
     args = parser.parse_args()
-    
-    if called_name == "main.py":
-      config.STUDIO = args.studio
-    elif called_name == "resolve.py":
-      config.STUDIO = False
-    elif called_name == "resolve-studio.py":
-      config.STUDIO = True
-    else:
-      print("Error: could not decode called script name", file=sys.stderr)
-      sys.exit(1)
 
     config.DOWNLOAD_ID = args.download_id
-    
+
+    config.STUDIO = _resolve_edition(called_name, args.studio)
+
     if config.STUDIO:
         config.APP_NAME = "DaVinci Resolve Studio"
         config.APP_TAG = "davinci-resolve-studio"
@@ -100,6 +112,13 @@ def main():
         config.INSTALL_PREFIX = args.prefix
     else:
         config.INSTALL_PREFIX = Path.home() / ".var" / "app" / app_id / "data"
+
+    # Where the (multi-GB) installer download and its extraction scratch go.
+    # Defaults to ~/Downloads; a packaged build points this at the app's own data
+    # directory so the download does not land in the user's Downloads folder.
+    if os.environ.get("RESOLVE_DOWNLOAD_DIR"):
+        config.DEST_DIR = Path(os.environ["RESOLVE_DOWNLOAD_DIR"])
+    config.DEST_DIR.mkdir(parents=True, exist_ok=True)
     
     # Handle --list-downloads
     if args.list_downloads:

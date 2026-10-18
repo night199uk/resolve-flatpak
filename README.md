@@ -114,6 +114,26 @@ flatpak run com.blackmagic.Resolve --download_id <download_id>
 
 This will install and run the version you want.
 
+## FlatPark
+
+This project is also packaged for [FlatPark](https://flatpark.org) as
+`com.blackmagic.Resolve` and `com.blackmagic.ResolveStudio` (registry entries in
+the [FlatPark repo](https://github.com/flatpark/flatpark)). That package does not
+use the KDE + PySide BaseApp these `.flatpak` bundles rely on: it fetches a
+self-contained tarball of this installer/launcher as Flatpack **extra-data** and
+runs it inside `org.freedesktop.Platform`.
+
+`build-bundle.sh` produces that tarball — a PyInstaller onedir tree carrying
+Python and PySide6-Essentials — and the `bundle` CI job builds it on every run
+and attaches `resolve-flatpak-<version>-x86_64.tar.gz` to each tagged release.
+The installer selects free vs Studio from the `RESOLVE_STUDIO` environment
+variable (or `--studio`), so one tarball serves both apps.
+
+```sh
+VERSION=$(git describe --tags) ./build-bundle.sh
+# -> resolve-flatpak-<version>-x86_64.tar.gz (+ its sha256 and size)
+```
+
 ## Licensing
 The icon in logo.png is licensed under the Creative [Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/deed.en) and fetched from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DaVinci_Resolve_Studio.png). It was only cropped afterwards.
 

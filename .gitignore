@@ -5,3 +5,5 @@ venv
 .repo
 .flatpak-builder
 __pycache__/
+.bundle-build/
+resolve-flatpak-*.tar.gz
