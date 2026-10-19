@@ -10,6 +10,7 @@ Thread → UI marshalling uses Qt queued signals instead of ``GLib.idle_add`` /
 ``GLib.timeout_add``.  ``fraction is None`` still means "indeterminate / pulse".
 """
 
+import sys
 import threading
 import time
 import traceback
@@ -162,6 +163,9 @@ class InstallerWindow(QMainWindow):
 
     # -- work flow (background thread) -------------------------------------
     def _work(self):
+        # Set only for a download we started; a file the user picked in
+        # _install_local must never be removed.
+        dest = None
         try:
             kind, value = self._source
             if kind == "file":
@@ -232,6 +236,16 @@ class InstallerWindow(QMainWindow):
             return self._finish(True, "Cancelled", "error")
         except Exception as exc:
             self._finish(False, f"Failed: {exc}", "error", traceback.format_exc())
+        finally:
+            # The archive is multi-GB; don't leave it — or a partial download
+            # after Cancel/failure — in downloads/ once we are done with it.
+            if dest is not None:
+                try:
+                    dest.unlink()
+                except FileNotFoundError:
+                    pass
+                except OSError as exc:
+                    print(f"Warning: could not remove {dest}: {exc}", file=sys.stderr)
 
     def _install_local(self, path):
         """Install from an installer the user downloaded themselves."""
