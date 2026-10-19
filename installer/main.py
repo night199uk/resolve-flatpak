@@ -15,6 +15,7 @@ import argparse
 import os
 import sys
 import textwrap
+import urllib.parse
 from pathlib import Path
 
 import config
@@ -42,6 +43,23 @@ def _resolve_edition(called_name, arg_studio):
     if called_name == "resolve-studio.py":
         return True
     return bool(arg_studio)
+
+
+def _local_files(items):
+    """Turn desktop-entry arguments into paths Resolve can open.
+
+    The desktop entries use ``%U``, which expands to ``file://`` URIs; Resolve
+    wants plain paths. Anything without a scheme is already a path, and other
+    schemes are passed through untouched.
+    """
+    paths = []
+    for item in items:
+        split = urllib.parse.urlsplit(item)
+        if split.scheme == "file":
+            paths.append(urllib.parse.unquote(split.path))
+        else:
+            paths.append(item)
+    return paths
 
 
 def main():
@@ -91,8 +109,15 @@ def main():
     parser.add_argument("--run-brawspeedtest", action="store_true", help="Launch Blackmagic RAW Speed Test")
     parser.add_argument("--run-panel-setup", action="store_true", help="Launch DaVinci Resolve Panels Setup")
     parser.add_argument("--run-remote-monitoring", action="store_true", help="Launch DaVinci Remote Monitoring")
+
+    # Files/URIs from the desktop entry's %U (e.g. a .drp opened in a file
+    # manager). argparse would otherwise reject them as unrecognized.
+    parser.add_argument("files", nargs="*", metavar="FILE",
+                        help="File(s) or URI(s) to open in Resolve")
     
     args = parser.parse_args()
+
+    files = _local_files(args.files)
 
     config.DOWNLOAD_ID = args.download_id
 
@@ -141,10 +166,12 @@ def main():
     
     # Handle launcher options
     if args.run_resolve:
-        sys.exit(launch_application("resolve", prefix=config.INSTALL_PREFIX, studio=config.STUDIO))
+        sys.exit(launch_application("resolve", prefix=config.INSTALL_PREFIX,
+                                    args=files or None, studio=config.STUDIO))
     
     if args.run_brawplayer:
-        sys.exit(launch_application("brawplayer", prefix=config.INSTALL_PREFIX, args=sys.argv[2:], studio=config.STUDIO))
+        sys.exit(launch_application("brawplayer", prefix=config.INSTALL_PREFIX,
+                                    args=files or None, studio=config.STUDIO))
     
     if args.run_brawspeedtest:
         sys.exit(launch_application("brawspeedtest", prefix=config.INSTALL_PREFIX, studio=config.STUDIO))
@@ -168,7 +195,8 @@ def main():
     # Default action (`flatpak run com.blackmagic.Resolve`): launcher flow.
     # Check installation and updates; if the current version is installed,
     # hand over execution to DaVinci Resolve immediately.
-    sys.exit(launch_application("resolve", prefix=config.INSTALL_PREFIX, studio=config.STUDIO))
+    sys.exit(launch_application("resolve", prefix=config.INSTALL_PREFIX,
+                                args=files or None, studio=config.STUDIO))
 
 
 if __name__ == "__main__":

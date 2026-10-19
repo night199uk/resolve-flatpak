@@ -259,9 +259,23 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
     if args:
         cmd.extend(args)
 
-    # Set up environment
+    # Set up environment. A frozen (PyInstaller) build prepends its _internal
+    # directory to LD_LIBRARY_PATH and stashes the value it replaced in
+    # LD_LIBRARY_PATH_ORIG. Resolve has to resolve its libraries against the
+    # Flatpak runtime, not against the build machine's libraries bundled in
+    # _internal, so put the original back before handing off.
     env = os.environ.copy()
-    env["LD_LIBRARY_PATH"] = str(prefix / "libs") + ":" + env.get("LD_LIBRARY_PATH", "")
+    if "LD_LIBRARY_PATH_ORIG" in env:
+        original = env.pop("LD_LIBRARY_PATH_ORIG")
+        if original:
+            env["LD_LIBRARY_PATH"] = original
+        else:
+            env.pop("LD_LIBRARY_PATH", None)
+    libs = str(prefix / "libs")
+    if env.get("LD_LIBRARY_PATH"):
+        env["LD_LIBRARY_PATH"] = libs + ":" + env["LD_LIBRARY_PATH"]
+    else:
+        env["LD_LIBRARY_PATH"] = libs
 
     # Ensure the app can find its own bundled libraries and resources
     # env["QT_QPA_PLATFORM"] = "xcb"
