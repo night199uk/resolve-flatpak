@@ -15,6 +15,7 @@ from pathlib import Path
 import requests
 
 import config
+import registration
 from api import get_latest_version_information, resolve_download_id_to_url
 from download import download_file
 from install import _find_squashfs_offset
@@ -85,9 +86,15 @@ def export_flatpak_resources(repo_dir, prefix=None, download_id=None):
 
 def _download_installer(app_tag, prefix, download_id=None):
     """Download the DaVinci Resolve installer."""
+    details = registration.load(prefix)
+    if details is None:
+        raise RuntimeError(
+            "No saved Blackmagic registration. Run the installer GUI once "
+            "and tick \"Remember these details\", then export again."
+        )
     if download_id:
         print(f"  Using specified download ID: {download_id}")
-        final_url = resolve_download_id_to_url(download_id, lambda t, f: None)
+        final_url = resolve_download_id_to_url(download_id, lambda t, f: None, details)
     else:
         print("  Fetching latest version information...")
         version, _, download_id = get_latest_version_information(
@@ -97,7 +104,7 @@ def _download_installer(app_tag, prefix, download_id=None):
         )
         print(f"  Latest version: {version['major']}.{version['minor']}.{version['patch']}")
         print(f"  Download ID: {download_id}")
-        final_url = resolve_download_id_to_url(download_id, lambda t, f: None)
+        final_url = resolve_download_id_to_url(download_id, lambda t, f: None, details)
     
     # Determine filename from URL
     name = urllib.parse.unquote(urllib.parse.urlsplit(final_url).path.split("/")[-1])

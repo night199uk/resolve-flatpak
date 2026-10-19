@@ -7,7 +7,7 @@ from pathlib import Path
 
 import requests
 
-from config import COOKIES, DOWNLOAD_DATA, HEADERS
+from config import COOKIES, HEADERS
 
 
 def get_latest_version_information(app_tag: str, report, refer_id: str = '77ef91f67a9e411bbbe299e595b4cfcc', stable=True):
@@ -48,12 +48,13 @@ def get_latest_version_information(app_tag: str, report, refer_id: str = '77ef91
     return (version, parsed_response["linux"]["releaseId"], parsed_response["linux"]["downloadId"])
 
 
-def resolve_download_id_to_url(download_id, report, refer_id: str = '77ef91f67a9e411bbbe299e595b4cfcc'):
+def resolve_download_id_to_url(download_id, report, registration, refer_id: str = '77ef91f67a9e411bbbe299e595b4cfcc'):
     """Convert a download ID to an actual download URL.
     
     Args:
         download_id: The download ID from Blackmagic
         report: Progress callback function(text, fraction)
+        registration: The user's own details for Blackmagic's download form
         refer_id: Blackmagic download page reference ID
     
     Returns:
@@ -68,11 +69,20 @@ def resolve_download_id_to_url(download_id, report, refer_id: str = '77ef91f67a9
             **HEADERS,
             "Referer": "https://www.blackmagicdesign.com/support/download/" + refer_id + "/Linux",
         },
-        data=json.dumps(DOWNLOAD_DATA),
+        data=json.dumps(registration),
     )
+    body = download_url_response.content.decode('utf-8', 'replace').strip()
+    if not download_url_response.ok:
+        raise RuntimeError(
+            f"Blackmagic rejected the registration (HTTP {download_url_response.status_code}). "
+            f"Check the details you entered. Blackmagic said: {body[:500] or '(no details)'}"
+        )
+    url = body
+    if not url.startswith("https://"):
+        raise RuntimeError(f"Blackmagic did not return a download link: {url[:200]}")
 
     report("Download link obtained", 1.0)
-    return download_url_response.content.decode('utf-8')
+    return url
 
 
 def list_downloads(app_tag: str, refer_id: str = '77ef91f67a9e411bbbe299e595b4cfcc'):

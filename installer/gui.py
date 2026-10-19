@@ -18,6 +18,7 @@ import urllib
 from PySide6.QtCore import QObject, QTimer, Qt, Signal
 from PySide6.QtWidgets import (
     QApplication,
+    QDialog,
     QHBoxLayout,
     QLabel,
     QMainWindow,
@@ -36,6 +37,7 @@ from api import (
 )
 from download import download_file
 from install import InstallationCancelled, install_application
+from registration import SourceDialog, version_from_filename
 
 
 class _InstallerSignals(QObject):
@@ -65,6 +67,7 @@ class InstallerWindow(QMainWindow):
         self._pulse_timer = None
         self._finished = False
         self._started = False
+        self._source = None  # ("download", registration) or ("file", Path)
 
         self._signals = _InstallerSignals()
         self._signals.report.connect(self._on_report)
@@ -130,9 +133,22 @@ class InstallerWindow(QMainWindow):
         super().showEvent(event)
         if not self._started:
             self._started = True
-            self.button.setEnabled(True)
-            worker = threading.Thread(target=self._work, daemon=True)
-            worker.start()
+            # Ask where the installer comes from before anything touches the
+            # network; queued so the dialog opens over the visible window.
+            QTimer.singleShot(0, self._choose_source)
+
+    def _choose_source(self):
+        dialog = SourceDialog(self)
+        if dialog.exec() != QDialog.DialogCode.Accepted or dialog.choice is None:
+            self._finish(True, "Cancelled", "error")
+            return
+        self._source = dialog.choice
+        if self._source[0] == "file":
+            config.STEPS = ["Installing application", "Complete"]
+            self.detail_label.setText(f"Installing from: {self._source[1]}")
+        self.button.setEnabled(True)
+        worker = threading.Thread(target=self._work, daemon=True)
+        worker.start()
 
     def _on_button_clicked(self):
         if self.button.text() == "Cancel":
@@ -147,6 +163,11 @@ class InstallerWindow(QMainWindow):
     # -- work flow (background thread) -------------------------------------
     def _work(self):
         try:
+            kind, value = self._source
+            if kind == "file":
+                return self._install_local(value)
+            registration_data = value
+
             if config.DOWNLOAD_ID is None:
                 # Get latest version from API
                 (version, release_id, download_id) = get_latest_version_information(
@@ -164,7 +185,7 @@ class InstallerWindow(QMainWindow):
                     self._finish(False, f"[{len(config.STEPS)}/{len(config.STEPS)}] {msg}", "ok")
                     return
 
-                final_url = resolve_download_id_to_url(download_id, self._step(1))
+                final_url = resolve_download_id_to_url(download_id, self._step(1), registration_data)
                 download_step_index = 2
             else:
                 # Look up version from download_id
@@ -182,7 +203,7 @@ class InstallerWindow(QMainWindow):
                     return
 
                 download_id = config.DOWNLOAD_ID
-                final_url = resolve_download_id_to_url(download_id, self._step(0))
+                final_url = resolve_download_id_to_url(download_id, self._step(0), registration_data)
                 download_step_index = 1
 
             name = urllib.parse.unquote(urllib.parse.urlsplit(final_url).path.split("/")[-1])
@@ -202,6 +223,29 @@ class InstallerWindow(QMainWindow):
 
             # Save version info after successful installation
             save_version_info(config.INSTALL_PREFIX, version, download_id)
+
+            v = version
+            msg = f"Complete - installed {v['major']}.{v['minor']}.{v['patch']}"
+            self._report(f"[{len(config.STEPS)}/{len(config.STEPS)}] {msg}", 1.0)
+            self._finish(False, msg, "ok")
+        except InstallationCancelled:
+            return self._finish(True, "Cancelled", "error")
+        except Exception as exc:
+            self._finish(False, f"Failed: {exc}", "error", traceback.format_exc())
+
+    def _install_local(self, path):
+        """Install from an installer the user downloaded themselves."""
+        try:
+            version = version_from_filename(path.name)
+            install_application(
+                path,
+                self._step(0),
+                self.cancel_event,
+                prefix=config.INSTALL_PREFIX,
+                studio=config.STUDIO,
+                version=version,
+            )
+            save_version_info(config.INSTALL_PREFIX, version, None)
 
             v = version
             msg = f"Complete - installed {v['major']}.{v['minor']}.{v['patch']}"

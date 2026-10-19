@@ -156,7 +156,13 @@ def install_application(dest, report, cancel_event, prefix=None, studio=None, ve
     try:
         report("Extracting installer archive (this can take a while)", None)
         run_file = _locate_run_archive(dest, workdir)
-        os.chmod(run_file, os.stat(run_file).st_mode | 0o111)
+        # The .run is only read (offset scan + unsquashfs), never executed, so
+        # the exec bit is cosmetic. A file picked through the document portal
+        # is read-only and refuses chmod; that must not abort the install.
+        try:
+            os.chmod(run_file, os.stat(run_file).st_mode | 0o111)
+        except OSError:
+            pass
         offset = _find_squashfs_offset(run_file)
         unsquashfs = shutil.which("unsquashfs")
         if unsquashfs is None:
