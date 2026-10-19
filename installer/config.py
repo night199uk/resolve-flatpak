@@ -24,18 +24,6 @@ CHUNK_SIZE = 512 * 1024  # 64 KiB
 
 STEPS = ["Finding Latest Version", "Resolving Download URL", "Downloading file", "Installing application", "Complete"]
 
-DOWNLOAD_DATA = {
-    "firstname": "Flatpak",
-    "lastname": "Builder",
-    "email": "someone@flathub.org",
-    "phone": "202-555-0194",
-    "country": "us",
-    "state": "New York",
-    "city": "FPK",
-    "street": "Bowery 146",
-    "product": "DaVinci Resolve"
-}
-
 COOKIES = {
     '_ga': 'GA1.2.1849503966.1518103294',
     '_gid': 'GA1.2.953840595.1518103294',
