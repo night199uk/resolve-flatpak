@@ -62,6 +62,53 @@ echo ">> running PyInstaller"
 [ -x "$build_root/dist/resolve-flatpak/resolve-flatpak" ] \
     || { echo "pyinstaller did not produce the launcher" >&2; exit 1; }
 
+# Do not ship the build machine's libxkbcommon. Qt's xcb platform plugin
+# compiles the X keymap with libxkbcommon-x11, which FlatPark's runtime
+# supplies (1.13.x); the Ubuntu wheel/build machine's libxkbcommon (1.6) that
+# PyInstaller collects is ABI-incompatible with it, and the first key press in
+# any text field segfaults in the keymap parser. Dropping both copies makes the
+# runtime provide a matched pair. (Same shadowing as the launcher's
+# LD_LIBRARY_PATH_ORIG fix, but for the Qt GUI itself.)
+rm -f "$build_root/dist/resolve-flatpak/_internal/libxkbcommon.so.0"*
+rm -f "$build_root/dist/resolve-flatpak/_internal/libxkbcommon-x11.so.0"*
+
+# Likewise use the runtime's fontconfig. The build machine's copy (Ubuntu 2.15,
+# Fedora 2.17) predates the runtime's 2.18 configuration syntax (`xsi:nil`,
+# `<const>`), so it logs a warning for every construct it does not understand
+# while parsing /etc/fonts/conf.d. The runtime's libfontconfig parses its own
+# configuration cleanly.
+rm -f "$build_root/dist/resolve-flatpak/_internal/libfontconfig.so.1"*
+
+# Build libcrypt.so.1 for Resolve. Its bundled libaprutil-1.so.0 binds crypt
+# symbols versioned GLIBC_2.2.5; the FlatPark runtime ships libxcrypt as
+# libcrypt.so.2, which defines XCRYPT_* but not GLIBC_2.2.5. Build libxcrypt with
+# the obsolete glibc API (the same recipe the .flatpak manifests use) and ship
+# the result beside the installer. The FlatPark wrapper puts libcrypt/ on
+# Resolve's LD_LIBRARY_PATH.
+LIBCRYPT_VERSION=4.5.2
+LIBCRYPT_SHA256=71513a31c01a428bccd5367a32fd95f115d6dac50fb5b60c779d5c7942aec071
+libxcrypt_root="$build_root/libxcrypt"
+rm -rf "$libxcrypt_root"
+mkdir -p "$libxcrypt_root"
+echo ">> building libxcrypt $LIBCRYPT_VERSION (glibc-ABI libcrypt.so.1)"
+curl -fsSL -o "$libxcrypt_root/libxcrypt.tar.xz" \
+    "https://github.com/besser82/libxcrypt/releases/download/v$LIBCRYPT_VERSION/libxcrypt-$LIBCRYPT_VERSION.tar.xz"
+echo "$LIBCRYPT_SHA256  $libxcrypt_root/libxcrypt.tar.xz" | sha256sum -c -
+tar -C "$libxcrypt_root" -xf "$libxcrypt_root/libxcrypt.tar.xz"
+(
+    cd "$libxcrypt_root/libxcrypt-$LIBCRYPT_VERSION"
+    CFLAGS="${CFLAGS:-} -Wno-error=discarded-qualifiers" \
+        ./configure --prefix="$libxcrypt_root/stage" \
+                    --enable-obsolete-api=glibc --disable-static
+    make -j"$(nproc)"
+    make install
+)
+mkdir -p "$build_root/dist/resolve-flatpak/libcrypt"
+cp -a "$libxcrypt_root/stage/lib/libcrypt.so.1"* \
+    "$build_root/dist/resolve-flatpak/libcrypt/"
+[ -e "$build_root/dist/resolve-flatpak/libcrypt/libcrypt.so.1" ] \
+    || { echo "libcrypt.so.1 missing after build" >&2; exit 1; }
+
 echo ">> packing $out"
 tar -C "$build_root/dist" -czf "$out" resolve-flatpak
 
