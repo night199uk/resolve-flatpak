@@ -72,6 +72,13 @@ echo ">> running PyInstaller"
 rm -f "$build_root/dist/resolve-flatpak/_internal/libxkbcommon.so.0"*
 rm -f "$build_root/dist/resolve-flatpak/_internal/libxkbcommon-x11.so.0"*
 
+# Likewise use the runtime's fontconfig. The build machine's copy (Ubuntu 2.15,
+# Fedora 2.17) predates the runtime's 2.18 configuration syntax (`xsi:nil`,
+# `<const>`), so it logs a warning for every construct it does not understand
+# while parsing /etc/fonts/conf.d. The runtime's libfontconfig parses its own
+# configuration cleanly.
+rm -f "$build_root/dist/resolve-flatpak/_internal/libfontconfig.so.1"*
+
 echo ">> packing $out"
 tar -C "$build_root/dist" -czf "$out" resolve-flatpak
 
