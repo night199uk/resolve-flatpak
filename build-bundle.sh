@@ -62,6 +62,16 @@ echo ">> running PyInstaller"
 [ -x "$build_root/dist/resolve-flatpak/resolve-flatpak" ] \
     || { echo "pyinstaller did not produce the launcher" >&2; exit 1; }
 
+# Do not ship the build machine's libxkbcommon. Qt's xcb platform plugin
+# compiles the X keymap with libxkbcommon-x11, which FlatPark's runtime
+# supplies (1.13.x); the Ubuntu wheel/build machine's libxkbcommon (1.6) that
+# PyInstaller collects is ABI-incompatible with it, and the first key press in
+# any text field segfaults in the keymap parser. Dropping both copies makes the
+# runtime provide a matched pair. (Same shadowing as the launcher's
+# LD_LIBRARY_PATH_ORIG fix, but for the Qt GUI itself.)
+rm -f "$build_root/dist/resolve-flatpak/_internal/libxkbcommon.so.0"*
+rm -f "$build_root/dist/resolve-flatpak/_internal/libxkbcommon-x11.so.0"*
+
 echo ">> packing $out"
 tar -C "$build_root/dist" -czf "$out" resolve-flatpak
 
