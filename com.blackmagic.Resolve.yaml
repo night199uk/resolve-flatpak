@@ -126,6 +126,7 @@ modules:
     build-commands:
       # Install the installer script and modules
       - install -Dm755 installer/main.py /app/bin/resolve.py
+      - install -Dm644 installer/registration.py /app/bin/registration.py
       - install -Dm644 installer/api.py /app/bin/api.py
       - install -Dm644 installer/config.py /app/bin/config.py
       - install -Dm644 installer/download.py /app/bin/download.py
@@ -176,6 +177,9 @@ modules:
         dest: installer
       - type: file
         path: installer/main.py
+        dest: installer
+      - type: file
+        path: installer/registration.py
         dest: installer
       - type: file
         path: installer/udev.py
