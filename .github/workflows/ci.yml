@@ -96,3 +96,32 @@ jobs:
             davinci*.flatpak
             resolve-flatpak-*.tar.gz
           generate_release_notes: true
+
+  # Tell FlatPark about the release so it re-pins the bundle without a manual PR.
+  # The release above is created with the default GITHUB_TOKEN, which does not
+  # trigger `on: release` workflows, so this runs in the same workflow after it.
+  # No token or secret is needed: FlatPark verifies the app id, repository and
+  # published tag against public facts.
+  #
+  # This only bumps the extra-data pin and adds a <release> to the metainfo. If a
+  # release also needs packaging changes (a new library staged by the wrapper or
+  # apply_extra, a renamed launcher or archive layout, permissions, a new app id,
+  # ...), open a PR against flatpark/flatpark as well — see "Keeping FlatPark up
+  # to date" in README.md.
+  flatpark:
+    needs: release
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    # A FlatPark hiccup must never fail the release.
+    continue-on-error: true
+    strategy:
+      matrix:
+        app-id:
+          - com.blackmagic.Resolve
+          - com.blackmagic.ResolveStudio
+    steps:
+      - name: Notify FlatPark
+        uses: flatpark/publish-action@v1
+        with:
+          app-id: ${{ matrix.app-id }}
+          tag: ${{ github.ref_name }}
