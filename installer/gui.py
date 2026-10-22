@@ -38,7 +38,7 @@ from api import (
 )
 from download import download_file
 from install import InstallationCancelled, install_application
-from registration import SourceDialog, version_from_filename
+from registration import SourceDialog, complete, load, version_from_filename
 
 
 class _InstallerSignals(QObject):
@@ -53,8 +53,9 @@ class _InstallerSignals(QObject):
 
 
 class InstallerWindow(QMainWindow):
-    def __init__(self, app_id=config.APP_TAG):
+    def __init__(self, app_id=config.APP_TAG, update=False):
         super().__init__()
+        self._update = update
         self.setWindowTitle(config.APP_NAME)
         self.resize(650, 220)
         self.setMinimumSize(520, 200)
@@ -134,9 +135,18 @@ class InstallerWindow(QMainWindow):
         super().showEvent(event)
         if not self._started:
             self._started = True
-            # Ask where the installer comes from before anything touches the
-            # network; queued so the dialog opens over the visible window.
-            QTimer.singleShot(0, self._choose_source)
+            saved = load() if self._update else None
+            if self._update and complete(saved):
+                # The update was already confirmed and the registration details
+                # are saved, so skip the source dialog and download directly.
+                self._source = ("download", saved)
+                self.button.setEnabled(True)
+                worker = threading.Thread(target=self._work, daemon=True)
+                worker.start()
+            else:
+                # Ask where the installer comes from before anything touches the
+                # network; queued so the dialog opens over the visible window.
+                QTimer.singleShot(0, self._choose_source)
 
     def _choose_source(self):
         dialog = SourceDialog(self)
@@ -359,8 +369,9 @@ class InstallerApp:
         sys.exit(app.run(sys.argv))
     """
 
-    def __init__(self, app_id=config.APP_TAG):
+    def __init__(self, app_id=config.APP_TAG, update=False):
         self.app_id = app_id
+        self._update = update
         self._app = None
         self._window = None
 
@@ -368,7 +379,7 @@ class InstallerApp:
         app = QApplication.instance() or QApplication(argv)
         self._app = app
 
-        self._window = InstallerWindow(app_id=self.app_id)
+        self._window = InstallerWindow(app_id=self.app_id, update=self._update)
         self._window.show()
 
         return self._app.exec()
