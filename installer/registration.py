@@ -62,6 +62,16 @@ def load(prefix=None):
     return data if isinstance(data, dict) else None
 
 
+def complete(data):
+    """True if `data` has every required registration field."""
+    if not isinstance(data, dict):
+        return False
+    for key, _label, required, _example in FIELDS:
+        if required and not str(data.get(key, "")).strip():
+            return False
+    return True
+
+
 def save(data, prefix=None):
     path = _path(prefix or config.INSTALL_PREFIX)
     path.parent.mkdir(parents=True, exist_ok=True)

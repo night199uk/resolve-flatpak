@@ -230,10 +230,12 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
     if latest and not is_version_suppressed(latest, prefix=prefix):
         choice = prompt_update(latest, studio=studio)
         if choice == "install_now":
-            # User wants to update - kick off installer GUI
+            # User wants to update - kick off installer GUI. With the details
+            # already saved, it downloads the new release directly instead of
+            # asking for the source form again.
             from gui import InstallerApp
             app_id = "com.blackmagic.ResolveStudio" if studio else "com.blackmagic.Resolve"
-            installer = InstallerApp(app_id=app_id)
+            installer = InstallerApp(app_id=app_id, update=True)
             exit_code = installer.run(sys.argv)
             
             # Check if update succeeded
