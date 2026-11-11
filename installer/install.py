@@ -333,7 +333,20 @@ def install_application(dest, report, cancel_event, prefix=None, studio=None, ve
                         archive.getmember(member)
                     except KeyError:
                         continue
+                    # An earlier release can leave the panel library read-only
+                    # (the tar member's mode) or owned by another user. On an
+                    # update tarfile.extract opens the destination for writing
+                    # without unlinking it, so it fails with EACCES. The parent
+                    # directory is writable (the payload copy just wrote there),
+                    # so remove the old file first, then normalise the mode so
+                    # later updates do not recreate the problem.
+                    dest = prefix / "libs" / member
+                    _remove_path(dest)
                     archive.extract(member, prefix / "libs")
+                    try:
+                        os.chmod(dest, 0o755)
+                    except OSError:
+                        pass
 
         task("Extracting panel framework API", 0.65, extract_panel_api)
 
