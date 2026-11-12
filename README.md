@@ -53,6 +53,16 @@ or
 flatpak run com.blackmagic.ResolveStudio --print-udev-rules | sudo sh
 ```
 
+Fonts
+-----
+
+Under Flatpak, the host's fonts are exposed at `/run/host/fonts`,
+`/run/host/local-fonts` and `/run/host/user-fonts`. The launcher points Fusion's
+`FUSION_FONTS` at those directories, so Text+ and Fusion titles see the same
+system and user fonts as the Edit page. (Fusion only scans `/usr/share/fonts` by
+default; the plain `Text` title uses fontconfig.) To add another font directory,
+add it to **Fusion → Fusion Settings → Path Map → `SystemFonts:`**.
+
 Plugins
 -------
 I have not yet updated the ffmpeg plugin to support this latest packaging mechanism.
