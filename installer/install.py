@@ -136,7 +136,7 @@ def install_application(dest, report, cancel_event, prefix=None, studio=None, ve
     if version is None:
         version = {"major": 21, "minor": 0, "patch": 0}  # Default to latest
     
-    app_id = "com.blackmagic.ResolveStudio" if studio else "com.blackmagic.Resolve"
+    app_id = config.APP_ID
     app_description = "DaVinci Resolve Studio" if studio else "DaVinci Resolve"
     major_version = version.get("major", 21)
 
