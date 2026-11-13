@@ -35,6 +35,18 @@ from download import download_file
 from install import InstallationCancelled, install_application
 
 
+# Font directories Flatpak maps from the host into the sandbox.
+HOST_FONT_DIRS = (
+    "/run/host/fonts",        # host /usr/share/fonts
+    "/run/host/local-fonts",  # host /usr/local/share/fonts
+    "/run/host/user-fonts",   # host ~/.local/share/fonts (or ~/.fonts)
+)
+
+
+def _host_font_dirs():
+    return [path for path in HOST_FONT_DIRS if os.path.isdir(path)]
+
+
 def check_installation(prefix=None):
     """Check if DaVinci Resolve is installed.
 
@@ -278,6 +290,16 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
         env["LD_LIBRARY_PATH"] = libs + ":" + env["LD_LIBRARY_PATH"]
     else:
         env["LD_LIBRARY_PATH"] = libs
+
+    # Flatpak maps the host's fonts into /run/host and fontconfig uses them, but
+    # Resolve's Fusion/Text+ scans only /usr/share/fonts. Fusion honours
+    # FUSION_FONTS for extra font directories, and its default SystemFonts path
+    # map already appends /usr/share/fonts. Set it only when the host dirs are
+    # present (i.e. under Flatpak) and the user has not set it themselves.
+    if not env.get("FUSION_FONTS"):
+        host_fonts = _host_font_dirs()
+        if host_fonts:
+            env["FUSION_FONTS"] = ";".join(host_fonts)
 
     # Ensure the app can find its own bundled libraries and resources
     # env["QT_QPA_PLATFORM"] = "xcb"
