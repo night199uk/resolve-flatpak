@@ -131,12 +131,18 @@ def main():
         config.APP_NAME = "DaVinci Resolve"
         config.APP_TAG = "davinci-resolve"
         app_id = "com.blackmagic.Resolve"
-    
+
+    # Use the running Flatpak app's id for the per-app data directory. This
+    # keeps one installer bundle working under both the current com.blackmagic.*
+    # ids and the planned com.blackmagicdesign.* ids; outside Flatpak, fall back
+    # to the edition's default.
+    config.APP_ID = os.environ.get("FLATPAK_ID") or app_id
+
     # Set default prefix
     if args.prefix:
         config.INSTALL_PREFIX = args.prefix
     else:
-        config.INSTALL_PREFIX = Path.home() / ".var" / "app" / app_id / "data"
+        config.INSTALL_PREFIX = Path.home() / ".var" / "app" / config.APP_ID / "data"
 
     # Where the (multi-GB) installer download and its extraction scratch go.
     # Defaults to ~/Downloads; a packaged build points this at the app's own data
@@ -189,7 +195,7 @@ def main():
         else:
             config.STEPS = ["Finding Latest Version", "Resolving Download URL", "Downloading file", "Installing application", "Complete"]
         
-        app = InstallerApp(app_id=app_id)
+        app = InstallerApp(app_id=config.APP_ID)
         sys.exit(app.run(sys.argv))
     
     # Default action (`flatpak run com.blackmagic.Resolve`): launcher flow.

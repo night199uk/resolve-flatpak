@@ -12,10 +12,15 @@ WANT_BETA = False
 # Where the downloaded file is saved.
 DEST_DIR = Path.home() / "Downloads"
 
+# Flatpak app id of the running package. main.py overrides this from
+# FLATPAK_ID, so one installer bundle serves any package id (the current
+# com.blackmagic.* ids and the planned com.blackmagicdesign.* ids alike).
+APP_ID = "com.blackmagic.Resolve"
+
 # Where the .run payload is installed to.
 # In Flatpak, /app is read-only, so we install to the user's data directory.
 # This will be overridden by main.py based on the app-id.
-INSTALL_PREFIX = Path.home() / ".var" / "app" / "com.blackmagic.Resolve" / "data"
+INSTALL_PREFIX = Path.home() / ".var" / "app" / APP_ID / "data"
 
 STUDIO = False
 DOWNLOAD_ID = None
