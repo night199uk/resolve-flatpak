@@ -1,7 +1,8 @@
-**Resolve:** [![Get it on FlatPark](https://flatpark.org/badges/get-it-on-flatpark.svg)](https://flatpark.org/apps/com.blackmagic.Resolve/)
-**Resolve Studio:** [![Get it on FlatPark](https://flatpark.org/badges/get-it-on-flatpark.svg)](https://flatpark.org/apps/com.blackmagic.ResolveStudio/)
-
-**Support the Author:** [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/night199uk)
+| Application | Link |
+|:--|:--:|
+| **Resolve** | [![Get it on FlatPark](https://flatpark.org/badges/get-it-on-flatpark.svg)](https://flatpark.org/apps/com.blackmagic.Resolve/) |
+| **Resolve Studio** | [![Get it on FlatPark](https://flatpark.org/badges/get-it-on-flatpark.svg)](https://flatpark.org/apps/com.blackmagic.ResolveStudio/) |
+| **Support the Author** | [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/night199uk) |
 
 # MAJOR UPDATE:
 I have completely rewritten this Flatpak support with a little help from
