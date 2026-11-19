@@ -22,7 +22,7 @@ jobs:
               key: davinci-resolve-studio
 
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.11
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
       options: --privileged
     steps:
     - uses: actions/checkout@v4

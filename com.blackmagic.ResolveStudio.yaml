@@ -5,20 +5,10 @@
 # DaVinci Resolve Studio is downloaded and installed on first launch.
 ####
 app-id: com.blackmagic.ResolveStudio
-runtime: org.kde.Platform
-runtime-version: &runtime-version '6.11'
-sdk: org.kde.Sdk
-base: io.qt.PySide.BaseApp
-base-version: '6.11'
+runtime: org.gnome.Platform
+runtime-version: '51'
+sdk: org.gnome.Sdk
 command: /app/bin/resolve-studio.py
-
-# PySide6 cleanup: the BaseApp's cleanup.sh removes WebEngine + NumPy at 
-# app-build time when these env vars are set.
-build-options:
-  env:
-    BASEAPP_REMOVE_WEBENGINE: "1"
-    BASEAPP_REMOVE_PYWEBENGINE: "1"
-    BASEAPP_DISABLE_NUMPY: "1"
 
 finish-args:
   # Display server access
@@ -55,10 +45,6 @@ finish-args:
   
   # GPU compute environment
   - --env=RUSTICL_ENABLE=radeonsi,iris,nouveau
-
-  # Force the installer to use X11 since DaVinci
-  # doesn't support Wayland yet.
-  - --env=QT_QPA_PLATFORM=xcb
 
 modules:
   # OpenGL Utility Library (required by DaVinci Resolve)

@@ -1,7 +1,6 @@
-"""Launcher functionality for DaVinci Resolve applications (PySide6).
+"""Launcher functionality for DaVinci Resolve applications (GTK4).
 
-PySide6 port of the original GTK ``launcher.py``.  The public contract used by
-``main.py`` is unchanged:
+Public contract used by ``main.py`` is unchanged:
 
 * ``check_installation(prefix=INSTALL_PREFIX)`` -> version dict or None
 * ``check_for_updates(prefix, studio=STUDIO)`` -> latest version dict or None
@@ -10,20 +9,18 @@ PySide6 port of the original GTK ``launcher.py``.  The public contract used by
   one of ``"install_now"`` / ``"install_later"`` / ``"dont_prompt"``
 * ``launch_application(app_name, prefix=..., args=..., studio=...)`` ->
   int exit code (handoff via ``os.execvpe``)
-
-The only change from the committed GTK version is that user prompts use
-``QMessageBox`` (PySide6) instead of ``Gtk.MessageDialog``.  Installation / URL
-resolution / version / exec handoff logic is otherwise identical.
 """
 
 import json
 import os
-import subprocess
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMessageBox
+import gi
+
+gi.require_version("Gtk", "4.0")
+
+from gi.repository import GLib, Gtk
 
 import config
 from api import (
@@ -68,7 +65,7 @@ def check_for_updates(prefix=None, studio=None):
         prefix = config.INSTALL_PREFIX
     if studio is None:
         studio = config.STUDIO
-    
+
     installed = check_installation(prefix)
     if not installed:
         return None
@@ -137,6 +134,57 @@ def is_version_suppressed(version, prefix=None):
     return version_str in suppressed
 
 
+def _dialog(title, text, buttons):
+    """Show a modal GTK4 dialog and return the chosen button's value.
+
+    Runs its own GLib main loop so callers keep the previous blocking
+    ``QMessageBox.exec()`` shape. Closing the window returns None.
+    """
+    Gtk.init()
+
+    window = Gtk.Window()
+    window.set_title(title)
+    window.set_default_size(420, -1)
+    window.set_modal(True)
+
+    label = Gtk.Label(label=text, xalign=0.0, wrap=True)
+    label.set_margin_top(18)
+    label.set_margin_start(18)
+    label.set_margin_end(18)
+
+    row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+    row.set_halign(Gtk.Align.END)
+    row.set_margin_bottom(18)
+    row.set_margin_start(18)
+    row.set_margin_end(18)
+
+    result = {"value": None}
+    loop = GLib.MainLoop()
+
+    def choose(value):
+        result["value"] = value
+        window.close()
+
+    for label_text, value in buttons:
+        button = Gtk.Button(label=label_text)
+        button.connect("clicked", lambda _button, v=value: choose(v))
+        row.append(button)
+
+    def on_close(*_):
+        loop.quit()
+        return False
+
+    window.connect("close-request", on_close)
+
+    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+    box.append(label)
+    box.append(row)
+    window.set_child(box)
+    window.present()
+    loop.run()
+    return result["value"]
+
+
 def prompt_installation(studio=False, parent_window=None):
     """Prompt the user to install DaVinci Resolve.
 
@@ -144,19 +192,14 @@ def prompt_installation(studio=False, parent_window=None):
         True if user wants to install, False otherwise
     """
     app_name = "DaVinci Resolve Studio" if studio else "DaVinci Resolve"
-
-    app = QApplication.instance() or QApplication(sys.argv[:1])
-    box = QMessageBox(parent_window)
-    box.setIcon(QMessageBox.Icon.Question)
-    box.setWindowTitle(config.APP_NAME)
-    box.setText(f"{app_name} is not installed.")
-    box.setInformativeText(f"Would you like to install {app_name} now?")
-    yes = box.addButton("Install Now", QMessageBox.ButtonRole.YesRole)
-    box.addButton("Install Later", QMessageBox.ButtonRole.NoRole)
-    box.setDefaultButton(yes)
-    box.exec()
-
-    return box.clickedButton() is yes
+    return bool(
+        _dialog(
+            config.APP_NAME,
+            f"{app_name} is not installed.\n\n"
+            f"Would you like to install {app_name} now?",
+            [("Install Now", True), ("Install Later", False)],
+        )
+    )
 
 
 def prompt_update(latest_version, studio=False, parent_window=None):
@@ -166,31 +209,19 @@ def prompt_update(latest_version, studio=False, parent_window=None):
         One of "install_now", "install_later", or "dont_prompt"
     """
     app_name = "DaVinci Resolve Studio" if studio else "DaVinci Resolve"
-
-    app = QApplication.instance() or QApplication(sys.argv[:1])
-    box = QMessageBox(parent_window)
-    box.setIcon(QMessageBox.Icon.Question)
-    box.setWindowTitle(config.APP_NAME)
-    box.setText(f"A new version of {app_name} is available.")
     v = latest_version
-    box.setInformativeText(
+    choice = _dialog(
+        config.APP_NAME,
+        f"A new version of {app_name} is available.\n\n"
         f"Version {v['major']}.{v['minor']}.{v['patch']} is now available. "
-        "Would you like to install it now?"
+        "Would you like to install it now?",
+        [
+            ("Install Now", "install_now"),
+            ("Install Later", "install_later"),
+            ("Don't prompt again", "dont_prompt"),
+        ],
     )
-
-    install_now = box.addButton("Install Now", QMessageBox.ButtonRole.YesRole)
-    install_later = box.addButton("Install Later", QMessageBox.ButtonRole.NoRole)
-    dont_prompt = box.addButton("Don't prompt again", QMessageBox.ButtonRole.RejectRole)
-    box.setDefaultButton(install_now)
-    box.exec()
-
-    clicked = box.clickedButton()
-    if clicked is install_now:
-        return "install_now"
-    elif clicked is install_later:
-        return "install_later"
-    else:
-        return "dont_prompt"
+    return choice or "dont_prompt"
 
 
 def launch_application(app_name, prefix=None, args=None, studio=None):
@@ -209,7 +240,7 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
         prefix = config.INSTALL_PREFIX
     if studio is None:
         studio = config.STUDIO
-    
+
     prefix = Path(prefix)
 
     # Gate: Check if installed, prompt to install if not
@@ -220,7 +251,7 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
             from gui import InstallerApp
             installer = InstallerApp(app_id=config.APP_ID)
             exit_code = installer.run(sys.argv)
-            
+
             # Check if installation succeeded
             if exit_code == 0:
                 installed = check_installation(prefix)
@@ -247,7 +278,7 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
             from gui import InstallerApp
             installer = InstallerApp(app_id=config.APP_ID, update=True)
             exit_code = installer.run(sys.argv)
-            
+
             # Check if update succeeded
             if exit_code == 0:
                 installed = check_installation(prefix)
@@ -300,7 +331,6 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
             env["FUSION_FONTS"] = ";".join(host_fonts)
 
     # Ensure the app can find its own bundled libraries and resources
-    # env["QT_QPA_PLATFORM"] = "xcb"
     env["RESOLVE_INSTALL_LOCATION"] = str(prefix)
     env["DAVINCI_RESOLVE_CONFIG_DIR"] = str(prefix / "config")
     env["DAVINCI_RESOLVE_LOG_DIR"] = str(prefix / "logs")
