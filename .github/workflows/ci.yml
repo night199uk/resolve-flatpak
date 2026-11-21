@@ -44,20 +44,16 @@ jobs:
         name: ${{ matrix.config.key }}.flatpak
         path: ${{ matrix.config.key }}.flatpak
 
-  # The self-contained installer/launcher tarball consumed by FlatPark as
-  # extra-data (see build-bundle.sh). Built on every run so a PR that breaks the
-  # bundle is caught, and attached to the release on a tag.
+  # The installer/launcher source tarball consumed by FlatPark as extra-data
+  # (see build-bundle.sh). Built on every run so a PR that breaks the bundle is
+  # caught, and attached to the release on a tag.
   bundle:
     name: "FlatPark bundle"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
 
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-
-    - name: Build the PyInstaller bundle
+    - name: Build the FlatPark bundle
       run: ./build-bundle.sh
 
     - name: Upload bundle artifact
