@@ -1,13 +1,12 @@
-"""PySide6 (Qt for Python) port of the installer GUI for DaVinci Resolve.
+"""GTK4 installer GUI for DaVinci Resolve.
 
-Faithful port of the committed GTK4 ``gui.py`` (243 lines).  Public contract
-consumed by ``main.py`` is unchanged::
+Public contract consumed by ``main.py`` is unchanged::
 
-    app = InstallerApp(app_id=app_id)
+    app = InstallerApp(app_id=config.APP_ID)
     sys.exit(app.run(sys.argv))
 
-Thread → UI marshalling uses Qt queued signals instead of ``GLib.idle_add`` /
-``GLib.timeout_add``.  ``fraction is None`` still means "indeterminate / pulse".
+Worker updates are marshalled to the GTK main loop with ``GLib.idle_add``;
+``fraction is None`` still means "indeterminate / pulse".
 """
 
 import sys
@@ -16,19 +15,12 @@ import time
 import traceback
 import urllib
 
-from PySide6.QtCore import QObject, QTimer, Qt, Signal
-from PySide6.QtWidgets import (
-    QApplication,
-    QDialog,
-    QHBoxLayout,
-    QLabel,
-    QMainWindow,
-    QPlainTextEdit,
-    QProgressBar,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-)
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Gdk", "4.0")
+
+from gi.repository import Gdk, Gio, GLib, Gtk
 
 import config
 from api import (
@@ -41,133 +33,129 @@ from install import InstallationCancelled, install_application
 from registration import SourceDialog, complete, load, version_from_filename
 
 
-class _InstallerSignals(QObject):
-    """Thread-safe bridge: worker thread -> Qt main (UI) thread.
-
-    Signals are emitted from the background worker and delivered on the main
-    thread via automatic queued connections (safe cross-thread marshalling).
-    """
-
-    report = Signal(str, object)          # text, fraction (None => pulse; else 0..1)
-    finish = Signal(bool, str, str, str)  # cancelled, message, css_class, details
-
-
-class InstallerWindow(QMainWindow):
-    def __init__(self, app_id=config.APP_TAG, update=False):
-        super().__init__()
-        self._update = update
-        self.setWindowTitle(config.APP_NAME)
-        self.resize(650, 220)
-        self.setMinimumSize(520, 200)
-
+class InstallerWindow(Gtk.ApplicationWindow):
+    def __init__(self, app_id=config.APP_ID, update=False, **kwargs):
+        super().__init__(**kwargs)
         self._app_id = app_id
+        self._update = update
+        self.set_title(config.APP_NAME)
+        self.set_default_size(650, 220)
+
         self.cancel_event = threading.Event()
         self._cancel_requested = False
         self._last_text = ""
         self._last_ui_at = 0.0
         self._pulse_src = None
-        self._pulse_timer = None
         self._finished = False
         self._started = False
         self._source = None  # ("download", registration) or ("file", Path)
 
-        self._signals = _InstallerSignals()
-        self._signals.report.connect(self._on_report)
-        self._signals.finish.connect(self._on_finish)
-
         self._build_ui()
+        self.connect("map", self._on_map)
 
     # -- UI construction ---------------------------------------------------
     def _build_ui(self):
-        self.step_label = QLabel("Initializing ...")
-        self.step_label.setWordWrap(True)
-        self.step_label.setObjectName("step_label")
+        self.step_label = Gtk.Label(label="Initializing ...", xalign=0.0)
+        self.step_label.set_wrap(True)
+        self.step_label.set_hexpand(True)
+        self.step_label.set_css_classes(["status"])
 
-        self.progress = QProgressBar()
-        self.progress.setRange(0, 100)
-        self.progress.setValue(0)
-        self.progress.setTextVisible(True)
+        self.progress = Gtk.ProgressBar()
+        self.progress.set_show_text(True)
+        self.progress.set_hexpand(True)
 
-        self.detail_label = QLabel(f"Saving to: {config.DEST_DIR}")
-        self.detail_label.setWordWrap(True)
-        self.detail_label.setStyleSheet("color: #888; font-size: 11px;")
-
-        # Failure output goes here, not into the status QLabel. A read-only
-        # QPlainTextEdit is selectable (mouse, keyboard, right-click -> Copy)
-        # and scrolls, so the full error and traceback stay readable even when
-        # they are long. Hidden until a failure needs it; sharing the step
-        # number in `step_label` keeps the summary visible above it.
-        self.details = QPlainTextEdit()
-        self.details.setObjectName("details")
-        self.details.setReadOnly(True)
-        self.details.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
-        self.details.setTextInteractionFlags(
-            Qt.TextInteractionFlag.TextSelectableByMouse
-            | Qt.TextInteractionFlag.TextSelectableByKeyboard
+        self.detail_label = Gtk.Label(
+            label=f"Saving to: {config.DEST_DIR}", xalign=0.0, wrap=True
         )
-        mono = self.details.font()
-        mono.setFamily("monospace")
-        self.details.setFont(mono)
-        self.details.setVisible(False)
+        self.detail_label.set_css_classes(["detail"])
 
-        self.button = QPushButton("Cancel")
-        self.button.setEnabled(False)
-        self.button.clicked.connect(self._on_button_clicked)
+        # Failure output goes here rather than into the status label: a
+        # read-only, selectable TextView in a scroller keeps a long traceback
+        # readable and copyable. Hidden until a failure needs it.
+        self.details = Gtk.TextView()
+        self.details.set_editable(False)
+        self.details.set_cursor_visible(False)
+        self.details.set_monospace(True)
+        self.details.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
+        self.details_scroller = Gtk.ScrolledWindow()
+        self.details_scroller.set_child(self.details)
+        self.details_scroller.set_vexpand(True)
+        self.details_scroller.set_visible(False)
 
-        central = QWidget()
-        layout = QVBoxLayout(central)
-        layout.setContentsMargins(24, 24, 24, 24)
-        layout.setSpacing(12)
-        layout.addWidget(self.step_label)
-        layout.addWidget(self.progress)
-        layout.addWidget(self.detail_label)
-        layout.addWidget(self.details, 1)
+        self.button = Gtk.Button(label="Cancel")
+        self.button.set_sensitive(False)
+        self.button.connect("clicked", self._on_button_clicked)
 
-        button_row = QHBoxLayout()
-        button_row.addStretch(1)
-        button_row.addWidget(self.button)
-        layout.addLayout(button_row)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        box.set_margin_top(24)
+        box.set_margin_bottom(24)
+        box.set_margin_start(24)
+        box.set_margin_end(24)
+        box.append(self.step_label)
+        box.append(self.progress)
+        box.append(self.detail_label)
+        box.append(self.details_scroller)
 
-        self.setCentralWidget(central)
+        button_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        button_row.set_halign(Gtk.Align.END)
+        button_row.append(self.button)
+        box.append(button_row)
+
+        self.set_child(box)
+        self._install_css()
+
+    @staticmethod
+    def _install_css():
+        css = b"""
+        .status { font-weight: bold; }
+        .detail { font-size: 11px; opacity: 0.7; }
+        .error  { color: #e01b24; }
+        .ok     { color: #2ec27e; }
+        """
+        provider = Gtk.CssProvider()
+        provider.load_from_data(css)
+        display = Gdk.Display.get_default()
+        if display is not None:
+            Gtk.StyleContext.add_provider_for_display(
+                display, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
 
     # -- lifecycle ---------------------------------------------------------
-    def showEvent(self, event):
-        super().showEvent(event)
-        if not self._started:
-            self._started = True
-            saved = load() if self._update else None
-            if self._update and complete(saved):
-                # The update was already confirmed and the registration details
-                # are saved, so skip the source dialog and download directly.
-                self._source = ("download", saved)
-                self.button.setEnabled(True)
-                worker = threading.Thread(target=self._work, daemon=True)
-                worker.start()
-            else:
-                # Ask where the installer comes from before anything touches the
-                # network; queued so the dialog opens over the visible window.
-                QTimer.singleShot(0, self._choose_source)
+    def _on_map(self, *_):
+        if self._started:
+            return
+        self._started = True
+        saved = load() if self._update else None
+        if self._update and complete(saved):
+            # The update was already confirmed and the registration details
+            # are saved, so skip the source dialog and download directly.
+            self._source = ("download", saved)
+            self.button.set_sensitive(True)
+            threading.Thread(target=self._work, daemon=True).start()
+        else:
+            # Ask where the installer comes from before anything touches the
+            # network; queued so the dialog opens over the visible window.
+            GLib.idle_add(self._choose_source)
 
     def _choose_source(self):
         dialog = SourceDialog(self)
-        if dialog.exec() != QDialog.DialogCode.Accepted or dialog.choice is None:
+        if not dialog.exec() or dialog.choice is None:
             self._finish(True, "Cancelled", "error")
-            return
+            return False
         self._source = dialog.choice
         if self._source[0] == "file":
             config.STEPS = ["Installing application", "Complete"]
-            self.detail_label.setText(f"Installing from: {self._source[1]}")
-        self.button.setEnabled(True)
-        worker = threading.Thread(target=self._work, daemon=True)
-        worker.start()
+            self.detail_label.set_text(f"Installing from: {self._source[1]}")
+        self.button.set_sensitive(True)
+        threading.Thread(target=self._work, daemon=True).start()
+        return False
 
-    def _on_button_clicked(self):
-        if self.button.text() == "Cancel":
+    def _on_button_clicked(self, button):
+        if button.get_label() == "Cancel":
             self._cancel_requested = True
             self.cancel_event.set()
-            self.step_label.setText("Cancelling ...")
-            self._report("Cancelling ...", None)
-            self.button.setEnabled(False)
+            self.step_label.set_text("Cancelling ...")
+            self.button.set_sensitive(False)
         else:  # Close
             self.close()
 
@@ -296,90 +284,83 @@ class InstallerWindow(QMainWindow):
         if force or (now - self._last_ui_at >= 0.1):
             self._last_text = text
             self._last_ui_at = now
-            self._signals.report.emit(text, fraction)
+            GLib.idle_add(self._ui_report, text, fraction)
 
-    def _on_report(self, text, fraction):
-        self.step_label.setText(text)
+    def _ui_report(self, text, fraction):
+        self.step_label.set_text(text)
         if fraction is None:
-            self.progress.setRange(0, 0)
-            self.progress.setValue(0)
+            self.progress.set_fraction(0.0)
             self._start_pulse()
         else:
             self._stop_pulse()
-            self.progress.setRange(0, 100)
-            self.progress.setValue(int(max(0.0, min(1.0, fraction)) * 100))
+            self.progress.set_fraction(max(0.0, min(1.0, fraction)))
+        return False
 
     def _start_pulse(self):
-        if self._pulse_timer is None:
-            self._pulse_timer = QTimer(self)
-            self._pulse_timer.timeout.connect(self._pulse)
-            self._pulse_timer.start(100)
+        if self._pulse_src is None:
+            self._pulse_src = GLib.timeout_add(100, self._pulse)
 
     def _stop_pulse(self):
-        if self._pulse_timer is not None:
-            self._pulse_timer.stop()
-            self._pulse_timer.deleteLater()
-            self._pulse_timer = None
+        if self._pulse_src is not None:
+            GLib.source_remove(self._pulse_src)
+            self._pulse_src = None
 
     def _pulse(self):
-        value = (self.progress.value() + 1) % 101
-        self.progress.setValue(value)
+        self.progress.pulse()
+        return True
 
     # -- completion --------------------------------------------------------
     def _finish(self, cancelled, message, css_class, details=""):
-        self._signals.finish.emit(cancelled, message, css_class, details)
+        GLib.idle_add(self._ui_finish, cancelled, message, css_class, details)
 
-    def _on_finish(self, cancelled, message, css_class, details):
+    def _ui_finish(self, cancelled, message, css_class, details):
         if self._finished:
-            return
+            return False
         self._finished = True
         self._stop_pulse()
-        self.step_label.setText(message or ("Cancelled" if cancelled else "Complete"))
-        if css_class == "ok":
-            self.progress.setRange(0, 100)
-            self.progress.setValue(100)
-            self.step_label.setStyleSheet("color: #2ec27e; font-weight: bold;")
-        else:
-            self.progress.setRange(0, 100)
-            self.progress.setValue(0)
-            self.step_label.setStyleSheet("color: #e01b24; font-weight: bold;")
-            if details:
-                self._show_details(details)
-        self.button.setText("Close")
-        self.button.setEnabled(True)
+        self.step_label.set_text(message or ("Cancelled" if cancelled else "Complete"))
+        self.step_label.set_css_classes(["status", css_class])
+        self.progress.set_fraction(1.0 if css_class == "ok" else 0.0)
+        if details:
+            self._show_details(details)
+        self.button.set_label("Close")
+        self.button.set_sensitive(True)
+        return False
 
     def _show_details(self, details):
         """Reveal the full, copyable failure output and enlarge the window."""
-        self.detail_label.setVisible(False)
-        self.details.setPlainText(details)
-        self.details.setVisible(True)
-        # Grow so a typical traceback is readable without scrolling; the view
-        # still scrolls for longer output. `selectAll` pre-selects the text so
-        # a plain Ctrl+C copies it without the user having to drag first.
-        self.setMinimumSize(760, 460)
-        self.resize(820, 560)
-        self.details.setFocus()
-        self.details.selectAll()
+        self.detail_label.set_visible(False)
+        buffer = self.details.get_buffer()
+        buffer.set_text(details)
+        self.details_scroller.set_visible(True)
+        self.set_default_size(820, 560)
+        self.details.grab_focus()
+        buffer.select_range(buffer.get_start_iter(), buffer.get_end_iter())
 
 
-class InstallerApp:
-    """PySide6 installer application.
+class InstallerApp(Gtk.Application):
+    """GTK4 installer application.
 
-        app = InstallerApp(app_id=APP_TAG)
+        app = InstallerApp(app_id=config.APP_ID)
         sys.exit(app.run(sys.argv))
     """
 
-    def __init__(self, app_id=config.APP_TAG, update=False):
-        self.app_id = app_id
+    def __init__(self, app_id=None, update=False):
+        super().__init__(
+            application_id=app_id or config.APP_ID,
+            flags=Gio.ApplicationFlags.NON_UNIQUE,
+        )
         self._update = update
-        self._app = None
-        self._window = None
 
-    def run(self, argv):
-        app = QApplication.instance() or QApplication(argv)
-        self._app = app
+    def do_activate(self):
+        window = InstallerWindow(
+            application=self,
+            app_id=self.get_application_id(),
+            update=self._update,
+        )
+        window.present()
 
-        self._window = InstallerWindow(app_id=self.app_id, update=self._update)
-        self._window.show()
-
-        return self._app.exec()
+    def run(self, argv=None):
+        # The launcher passes main.py's argv; GTK would try to parse those
+        # options, so only hand it the program name.
+        return super().run([sys.argv[0]])
