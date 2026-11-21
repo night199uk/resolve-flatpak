@@ -6,7 +6,7 @@
 
 # MAJOR UPDATE:
 I have completely rewritten this Flatpak support with a little help from
-Claude to use a Qt-based meta-installer style approach similar to Steam
+Claude to use a GTK4-based meta-installer style approach similar to Steam
 or Discord. I had initially hoped to use Flatpak's extra-data approach,
 however bugs in Flatpak's implementation of extra-data related to very
 large downloads (>8GB) pushed me away from this.
@@ -23,7 +23,7 @@ resolve-flatpak
 
 This Flatpak installs DaVinci Resolve using Flatpak. 
 
-Technically it is a Qt-based installer that installs DaVinci Resolve
+Technically it is a GTK4-based installer that installs DaVinci Resolve
 from the Blackmagic website on-demand.  It manages the installation,
 checks for updates on run, etc. The Flatpak itself contains no Blackmagic
 binaries or copyright material; and thus can be distributed on Flathub,
@@ -63,6 +63,30 @@ Under Flatpak, the host's fonts are exposed at `/run/host/fonts`,
 system and user fonts as the Edit page. (Fusion only scans `/usr/share/fonts` by
 default; the plain `Text` title uses fontconfig.) To add another font directory,
 add it to **Fusion → Fusion Settings → Path Map → `SystemFonts:`**.
+
+GPU acceleration (AMD)
+----------------------
+
+DaVinci Resolve needs a working OpenCL implementation *inside* the Flatpak
+sandbox, and on AMD that is the most common cause of "Unsupported GPU processing
+mode" errors. Mesa RustICL is enabled by default, but its Resolve support is
+patchy; the [rocm-flatpak](https://github.com/night199uk/rocm-flatpak) runtime
+extension is the more reliable fallback and now works with both the `.flatpak`
+bundles and the FlatPark package. For ROCm, export
+`FLATPAK_GL_DRIVERS=ROCm`.
+
+If you previously added an `OCL_ICD_VENDORS` override for ROCm, remove it; the
+current ROCm Runtime no longer needs it:
+
+```
+flatpak override --user --unset-env=OCL_ICD_VENDORS com.blackmagic.Resolve
+# if the override was system-wide:
+sudo flatpak override --unset-env=OCL_ICD_VENDORS com.blackmagic.Resolve
+```
+
+Replace `com.blackmagic.Resolve` with `com.blackmagic.ResolveStudio` for Studio.
+See [docs/amd-gpu.md](docs/amd-gpu.md) for the full troubleshooting guide,
+including multi-GPU selection and what to include in a bug report.
 
 Plugins
 -------
