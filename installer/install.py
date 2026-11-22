@@ -60,7 +60,7 @@ def _make_symlink(target, link):
     link.symlink_to(target)
 
 
-def _ensure_library_symlinks(root):
+def ensure_library_symlinks(root):
     """Recreate missing soname links for the bundled libraries.
 
     The Free installer payload ships versioned libraries (for example
@@ -327,7 +327,7 @@ def install_application(dest, report, cancel_event, prefix=None, studio=None, ve
         task("Disabling bundled GLib libraries", 0.5, strip_glib)
 
         def restore_library_symlinks():
-            created = _ensure_library_symlinks(prefix / "libs")
+            created = ensure_library_symlinks(prefix / "libs")
             if created:
                 print(f"Restored {created} library symlinks")
 

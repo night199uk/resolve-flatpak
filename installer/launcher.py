@@ -29,7 +29,7 @@ from api import (
     save_version_info, versions_match,
 )
 from download import download_file
-from install import InstallationCancelled, install_application
+from install import InstallationCancelled, ensure_library_symlinks, install_application
 
 
 # Font directories Flatpak maps from the host into the sandbox.
@@ -293,6 +293,15 @@ def launch_application(app_name, prefix=None, args=None, studio=None):
             # User doesn't want to be prompted for this version again
             save_dont_prompt_version(latest, prefix=prefix)
         # "install_later" or "dont_prompt" - continue to handoff
+
+    # Repair missing soname links for installs made by an older installer: the
+    # Free payload ships versioned libraries without the links Resolve's ELF
+    # binaries need. Doing it at launch also covers users who update the Flatpak
+    # but already have the current Resolve version installed.
+    try:
+        ensure_library_symlinks(prefix / "libs")
+    except Exception as e:
+        print(f"Warning: could not restore library symlinks: {e}", file=sys.stderr)
 
     # Handoff to Resolve
     app_bin = prefix / "bin"
