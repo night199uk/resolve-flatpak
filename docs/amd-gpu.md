@@ -162,8 +162,11 @@ directory. For both the `.flatpak` bundles and the FlatPark package this is:
 ```sh
 ls -lt ~/.var/app/com.blackmagic.Resolve/data/logs | head
 grep -E 'GPUDetect|GPUConfig|OpenCL|OpenGL' \
-  ~/.var/app/com.blackmagic.Resolve/data/logs/DaVinci-Resolve-*.log | tail -n 60
+  ~/.var/app/com.blackmagic.Resolve/data/logs/rollinglog.txt* | tail -n 60
 ```
+
+Resolve writes `rollinglog.txt` and rotates it to `rollinglog.txt.N`; the glob
+above covers both.
 
 A failed GPU setup looks like this:
 
@@ -395,7 +398,7 @@ lspci -nn | grep -Ei 'vga|3d|display'
 glxinfo -B
 clinfo | grep -E 'Platform (Name|Version)|Device Name'
 grep -E 'GPUDetect|GPUConfig' \
-  ~/.var/app/com.blackmagic.Resolve/data/logs/DaVinci-Resolve-*.log | tail -n 60
+  ~/.var/app/com.blackmagic.Resolve/data/logs/rollinglog.txt* | tail -n 60
 ```
 
 If you use ROCm, also include the output of
