@@ -1,6 +1,7 @@
 """Installation logic for DaVinci Resolve."""
 
 import os
+import re
 import shutil
 import subprocess
 import tarfile
@@ -58,6 +59,58 @@ def _make_symlink(target, link):
     if link.is_symlink() or link.exists():
         link.unlink()
     link.symlink_to(target)
+
+
+_LIB_VERSION_RE = re.compile(r"^(?P<stem>.+\.so)\.(?P<major>\d+)(?:[.\-~].*)?$")
+
+
+def _ensure_library_symlinks(root):
+    """Recreate missing soname/linker links for the bundled libraries.
+
+    The Free installer payload ships versioned libraries (for example
+    ``libavcodec.so.60.3.100``) without the ``libavcodec.so.60`` and
+    ``libavcodec.so`` links.  Resolve's binaries link against the soname, so
+    without those links the loader cannot use the bundled FFmpeg and H.264 /
+    HEVC / audio decoding fails.  The Studio payload includes the links;
+    recreate whichever are missing.  Existing regular files are never replaced,
+    and a linker link is only added when a stem has a single major version.
+    """
+    root = Path(root)
+    if not root.is_dir():
+        return 0
+
+    versioned = []
+    majors = {}
+    with os.scandir(root) as entries:
+        for entry in entries:
+            if not entry.is_file(follow_symlinks=False):
+                continue
+            match = _LIB_VERSION_RE.match(entry.name)
+            if match is None:
+                continue
+            stem = match.group("stem")
+            major = match.group("major")
+            majors.setdefault(stem, set()).add(major)
+            versioned.append((Path(entry.path), stem, major))
+
+    def link_to(target, link):
+        if link.is_symlink():
+            if link.exists():
+                return False
+            link.unlink()
+        elif link.exists():
+            return False
+        os.symlink(target.name, link)
+        return True
+
+    created = 0
+    for target, stem, major in versioned:
+        soname = target.parent / f"{stem}.{major}"
+        if soname != target and link_to(target, soname):
+            created += 1
+        if len(majors[stem]) == 1 and link_to(target, target.parent / stem):
+            created += 1
+    return created
 
 
 def _find_squashfs_offset(path):
@@ -291,6 +344,13 @@ def install_application(dest, report, cancel_event, prefix=None, studio=None, ve
                     shutil.move(str(lib), str(disabled_dir / lib.name))
 
         task("Disabling bundled GLib libraries", 0.5, strip_glib)
+
+        def restore_library_symlinks():
+            created = _ensure_library_symlinks(prefix / "libs")
+            if created:
+                print(f"Restored {created} library symlinks")
+
+        task("Restoring library soname links", 0.52, restore_library_symlinks)
 
         def copy_scripts_and_share():
             for name in ("script.checkfirmware", "script.getlogs.v4", "script.start"):
