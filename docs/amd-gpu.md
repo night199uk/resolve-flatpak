@@ -98,6 +98,7 @@ ls -l /usr/lib/x86_64-linux-gnu/GL/
 ls -l /usr/lib/x86_64-linux-gnu/GL/OpenCL/vendors/
 find /usr/lib/x86_64-linux-gnu/GL \( -iname '*rusticl*' -o -iname '*opencl*' \)
 ldconfig -p | grep -iE 'rusticl|opencl'
+ls -l /usr/lib/x86_64-linux-gnu/GL/ROCm/bin/ 2>/dev/null
 ```
 
 Notes:
@@ -116,18 +117,42 @@ Notes:
   value that points at a missing directory makes the loader find **zero**
   platforms.
 
-The `org.freedesktop.Platform.ClInfo` runtime can also be used to inspect
-OpenCL, but remember it has its own sandbox and may report zero platforms even
-when Resolve's sandbox is fine:
+### ROCm Runtime tools
+
+The ROCm Runtime ships its own `clinfo` and `rocminfo`, and they run inside the
+same sandbox Resolve uses. After installing ROCm and setting
+`FLATPAK_GL_DRIVERS=ROCm` (section 5), open the app sandbox and run:
 
 ```sh
-# both the .flatpak bundles and the FlatPark package use 26.08
-BRANCH=26.08
-flatpak install flathub "org.freedesktop.Platform.ClInfo//$BRANCH"
-flatpak run --device=dri --command=clinfo "org.freedesktop.Platform.ClInfo//$BRANCH"
+ROCM=/usr/lib/x86_64-linux-gnu/GL/ROCm
+$ROCM/bin/rocminfo
+$ROCM/bin/clinfo
 ```
 
-When testing ROCm, add `FLATPAK_GL_DRIVERS=ROCm` to that command.
+`rocminfo` should show an agent for the card:
+
+```text
+Agent 2
+  Name:                    gfx1100
+  Marketing Name:          AMD Radeon RX 7900 XTX
+  Vendor Name:             AMD
+  ...
+```
+
+`clinfo` should show the AMD OpenCL platform and the same GPU:
+
+```text
+  Platform Name                                   AMD Accelerated Parallel Processing
+  Platform Vendor                                 Advanced Micro Devices, Inc.
+  ...
+  Device Name                                     gfx1100
+```
+
+The exact platform count depends on whether the runtime's Mesa build also
+exposes RustICL. What matters is that your `gfx*` card appears. If the binaries
+are missing, either the ROCm extension is not bound (section 5) or the installed
+ROCm Runtime predates the bundled tools; update to the latest rocm-flatpak
+release.
 
 ## 3. Read Resolve's log
 
@@ -272,6 +297,10 @@ ls -l /usr/lib/x86_64-linux-gnu/GL/ROCm
 ls -l /usr/lib/x86_64-linux-gnu/GL/OpenCL/vendors/
 ```
 
+The runtime's own `rocminfo` and `clinfo` should also be there; run them as
+described in section 2 to confirm that the extension is bound and that ROCm
+sees the GPU.
+
 If the ROCm ro-bind or `/usr/lib/x86_64-linux-gnu/GL/ROCm` is missing, the
 extension is not bound. Reinstall the latest rocm-flatpak release into the same
 installation and run `flatpak update`. With the current `1.4` branch there is
@@ -368,6 +397,10 @@ clinfo | grep -E 'Platform (Name|Version)|Device Name'
 grep -E 'GPUDetect|GPUConfig' \
   ~/.var/app/com.blackmagic.Resolve/data/logs/DaVinci-Resolve-*.log | tail -n 60
 ```
+
+If you use ROCm, also include the output of
+`/usr/lib/x86_64-linux-gnu/GL/ROCm/bin/rocminfo` and
+`/usr/lib/x86_64-linux-gnu/GL/ROCm/bin/clinfo` from inside the app sandbox.
 
 Attach the full Resolve log rather than a screenshot of the error dialog. Also
 mention whether you use the `.flatpak` bundle or the FlatPark package, and which
